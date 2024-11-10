@@ -1,1 +1,8 @@
 rootProject.name = 'tech-blog'
+include 'untitled'
+include 'common'
+include 'external'
+include 'blog-api'
+include 'external:naver-client'
+findProject(':external:naver-client')?.name = 'naver-client'
+
