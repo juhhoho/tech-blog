@@ -1,5 +1,4 @@
 rootProject.name = 'tech-blog'
-include 'untitled'
 include 'common'
 include 'external'
 include 'blog-api'
