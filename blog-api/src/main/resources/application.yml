@@ -1,4 +1,13 @@
 spring:
+  profiles:
+    active: local
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: local
   h2:
     console:
       enabled: true
@@ -9,7 +18,7 @@ spring:
     password:
   jpa:
     hibernate:
-      ddl-auto: create # TODO 추후 옵션 변경 -> 개발환경에서는 update 사용
+      ddl-auto: create
     properties:
       hibernate:
         format_sql: true
@@ -19,7 +28,7 @@ spring:
         #registration
         registration:
           naver:
-            client-name: naver
+            client-name: naver-client
             client-id: ${X-Naver-Client-Id}
             client-secret: ${X-Naver-Client-Secret}
             redirect-uri: http://localhost:8080/login/oauth2/code/naver

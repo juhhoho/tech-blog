@@ -27,6 +27,6 @@ class NaverClientItTest extends Specification {
         def naverNewsResponse = naverClient.search("news", 1 , 10)
 
         then:
-        naverNewsResponse.total() == 7635362
+        naverNewsResponse.total == 7635362
     }
 }

@@ -32,4 +32,5 @@ class NaverClientConfigurationTest extends Specification {
 
 
 
+
 }
