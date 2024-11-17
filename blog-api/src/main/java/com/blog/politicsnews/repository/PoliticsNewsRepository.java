@@ -1,0 +1,11 @@
+package com.blog.politicsnews.repository;
+
+import com.blog.politicsnews.dto.response.PageResult;
+import com.blog.politicsnews.dto.response.SearchResponse;
+import org.springframework.data.repository.query.Param;
+
+public interface PoliticsNewsRepository {
+    PageResult<SearchResponse> search(@Param("query")String query,
+                                  @Param("page")int page,
+                                  @Param("size")int size);
+}
