@@ -9,8 +9,6 @@ import lombok.ToString;
 @ToString
 @Setter
 public class GetBlogPostsRequest {
-
-
     // 1 ~ 10000
     @NotNull(message = "입력은 비어있을 수 없습니다.")
     @Min(value = 1, message = "페이지 번호는 1 이상이어야 합니다.")

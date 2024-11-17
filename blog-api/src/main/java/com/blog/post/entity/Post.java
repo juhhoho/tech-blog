@@ -33,4 +33,8 @@ public class Post {
         this.description = description;
         this.lastBuildTime = lastBuildTime;
     }
+
+    public void setIdForTest(Long id){
+        this.id = id;
+    }
 }
