@@ -1,5 +1,6 @@
 package com.blog.post.controller
 
+import com.blog.oauth2.jwt.JWTUtil
 import com.blog.post.dto.response.GetOneBlogPostResponse
 import com.blog.post.dto.response.PostBlogPostsResponse
 import com.blog.post.dto.response.PostReplyResponse
@@ -18,16 +19,17 @@ class PostControllerTest extends Specification{
     PostController postController
 
     PostApplicationService postApplicationService = Mock()
+    JWTUtil jwtUtil = Mock()
     MockMvc mockMvc
 
 
 
     void setup(){
-        postController = new PostController(postApplicationService)
+        postController = new PostController(postApplicationService, jwtUtil)
         mockMvc = MockMvcBuilders.standaloneSetup(postController).build()
     }
 
-    def "컨트롤러의 getBlogPosts 메서드가 정상적으로 동작한다."(){
+    def "[GET] 컨트롤러의 getBlogPosts 메서드가 정상적으로 동작한다."(){
         given:
         def givenPage = 1
         def givenSize = 1
@@ -50,26 +52,32 @@ class PostControllerTest extends Specification{
         }
     }
 
-    def "컨트롤러의 postBlogPosts 메서드가 정상적으로 동작한다."() {
+    def "[POST] 컨트롤러의 postBlogPosts 메서드가 정상적으로 동작한다."() {
         given:
         def givenTitle = "ex_title"
         def givenDescription = "ex_description"
-
+        def givenUsername = "ex_username"
+        def givenAuthHeader = "ex_header"
+        def givenName = "ex_name"
         def expectedResponse = PostBlogPostsResponse.builder()
                 .id(1L)
                 .title(givenTitle)
                 .description(givenDescription)
                 .lastBuildTime(LocalDateTime.now())
+                .name(givenName)
                 .build()
 
         // 서비스 계층의 Mock 동작 설정
-        postApplicationService.postBlogPosts(givenTitle, givenDescription) >> ResponseEntity
+        postApplicationService.postBlogPosts(givenTitle, givenDescription,givenUsername) >> ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(expectedResponse)
+
+        jwtUtil.getUsernameFromAuthorizationHeader(givenAuthHeader) >> givenUsername
 
         when:
         def response = mockMvc.perform(MockMvcRequestBuilders.post("/v1/blog/posts")
                 .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "${givenAuthHeader}")
                 .content("""
                     {
                         "title": "${givenTitle}",
@@ -84,14 +92,15 @@ class PostControllerTest extends Specification{
         response.status == HttpStatus.OK.value()
 
         and:
-        1 * postApplicationService.postBlogPosts(givenTitle, givenDescription) >>{
-            String title, String description ->
+        1 * postApplicationService.postBlogPosts(givenTitle, givenDescription, givenUsername) >>{
+            String title, String description, String username ->
                 assert title == givenTitle
                 assert description == givenDescription
+                assert username == givenUsername
         }
     }
 
-    def "컨트롤러의 getOneBlogPost 메서드가 정상적으로 동작한다."() {
+    def "[GET] 컨트롤러의 getOneBlogPost 메서드가 정상적으로 동작한다."() {
         given:
         def givenPostId = 1L
 
@@ -123,7 +132,7 @@ class PostControllerTest extends Specification{
         }
     }
 
-    def "컨트롤러의 postReply 메서드가 정상적으로 동작한다."(){
+    def "[POST] 컨트롤러의 postReply 메서드가 정상적으로 동작한다."(){
         given:
         def givenPostId = 1l
         def givenReplyId = 1L

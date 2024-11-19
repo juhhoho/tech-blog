@@ -1,5 +1,6 @@
 package com.blog.post.entity;
 
+import com.blog.oauth2.entity.User;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -33,11 +34,17 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<Reply> replies = new ArrayList<>();
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+
     @Builder
-    public Post(String title, String description, LocalDateTime lastBuildTime) {
+    public Post(String title, String description, LocalDateTime lastBuildTime, User user) {
         this.title = title;
         this.description = description;
         this.lastBuildTime = lastBuildTime;
+        this.user = user;
     }
 
     public void setIdForTest(Long id){

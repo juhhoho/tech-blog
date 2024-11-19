@@ -1,4 +1,5 @@
 package com.blog.post.service;
+import com.blog.oauth2.repository.UserRepository;
 import com.blog.politicsnews.dto.response.PageResult;
 import com.blog.post.dto.response.GetBlogPostsResponse;
 import com.blog.post.dto.response.GetOneBlogPostResponse;

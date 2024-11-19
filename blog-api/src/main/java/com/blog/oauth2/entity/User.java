@@ -1,14 +1,19 @@
 package com.blog.oauth2.entity;
 
+import com.blog.post.entity.Post;
+import com.blog.post.entity.Reply;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString
 @Table(name = "blog_user")
-public class UserEntity {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,8 +31,12 @@ public class UserEntity {
     @Column(name = "role")
     private String role;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Post> posts = new ArrayList<>();
+
+
     @Builder
-    public UserEntity(String userName, String name, String email, String role) {
+    public User(String userName, String name, String email, String role) {
         this.userName = userName;
         this.name = name;
         this.email = email;

@@ -1,6 +1,8 @@
 package com.blog.oauth2.jwt;
 
 import io.jsonwebtoken.Jwts;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -15,8 +17,6 @@ public class JWTUtil {
     private SecretKey secretKey;
 
     public JWTUtil(@Value("${spring.jwt.secret}")String secret) {
-
-
         secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
     }
 
@@ -44,5 +44,26 @@ public class JWTUtil {
                 .expiration(new Date(System.currentTimeMillis() + expiredMs))
                 .signWith(secretKey)
                 .compact();
+    }
+
+
+    public String getUsernameFromCookies(HttpServletRequest request){
+        String authCookie = null;
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("Authorization".equals(cookie.getName())) {
+                    authCookie = cookie.getValue();
+                    break;
+                }
+            }
+        }
+        if(authCookie == null){
+            throw new IllegalArgumentException("Authorization token is missing from cookies");
+        }
+        // Extract username from token
+        String authToken = authCookie.replace("Authorization=", "");
+        return getUsername(authToken);
+
+
     }
 }

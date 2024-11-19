@@ -4,7 +4,7 @@ import com.blog.oauth2.dto.CustomOAuth2User;
 import com.blog.oauth2.dto.UserDTO;
 import com.blog.oauth2.dto.response.NaverResponse;
 import com.blog.oauth2.dto.response.OAuth2Response;
-import com.blog.oauth2.entity.UserEntity;
+import com.blog.oauth2.entity.User;
 import com.blog.oauth2.repository.UserRepository;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -40,11 +40,11 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
 
         String username = oAuth2Response.getProvider()+" "+oAuth2Response.getProviderId();
-        UserEntity existUser = userRepository.findByUserName(username);
+        User existUser = userRepository.findByUserName(username);
 
         if (existUser == null) {
 
-            UserEntity userEntity = UserEntity.builder()
+            User userEntity = User.builder()
                     .userName(username)
                     .email(oAuth2Response.getEmail())
                     .name(oAuth2Response.getName())

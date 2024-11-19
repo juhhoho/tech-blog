@@ -1,5 +1,6 @@
 package com.blog.post.dto.response;
 
+import com.blog.oauth2.entity.User;
 import com.blog.post.dto.ReplyDto;
 import com.blog.post.entity.Post;
 import lombok.AllArgsConstructor;
@@ -16,14 +17,16 @@ public class GetOneBlogPostResponse {
     private String title;
     private String description;
     private LocalDateTime lastBuildTime;
+    private User user;
     private List<ReplyDto> replies;
 
 
     @Builder
-    public GetOneBlogPostResponse(String title, String description, LocalDateTime lastBuildTime, List<ReplyDto> replies) {
+    public GetOneBlogPostResponse(String title, String description, LocalDateTime lastBuildTime, User user,List<ReplyDto> replies) {
         this.title = title;
         this.description = description;
         this.lastBuildTime = lastBuildTime;
+        this.user = user;
         this.replies = replies;
     }
 
@@ -35,6 +38,6 @@ public class GetOneBlogPostResponse {
                 .map(reply -> new ReplyDto(reply.getId(), reply.getContent()))
                 .toList();
 
-        return new GetOneBlogPostResponse(post.getId(), post.getTitle(), post.getDescription(), post.getLastBuildTime(), replies);
+        return new GetOneBlogPostResponse(post.getId(), post.getTitle(), post.getDescription(), post.getLastBuildTime(), post.getUser(),replies);
     }
 }

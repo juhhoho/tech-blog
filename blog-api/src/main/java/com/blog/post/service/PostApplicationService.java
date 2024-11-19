@@ -21,16 +21,16 @@ public class PostApplicationService {
         return postQueryService.getBlogPosts(page, size);
     }
 
-    public ResponseEntity<PostBlogPostsResponse> postBlogPosts(String title, String description) {
-        return postCommandService.postBlogPosts(title, description);
+    public ResponseEntity<PostBlogPostsResponse> postBlogPosts(String title, String description, String username) {
+        return postCommandService.postBlogPosts(title, description, username);
     }
 
     public ResponseEntity<GetOneBlogPostResponse> getOneBlogPosts(Long postId) {
         return postQueryService.getOneBlogPosts(postId);
     }
 
-    public ResponseEntity<PostReplyResponse> postReply(Long postId, String content) {
-        return postCommandService.postReply(postId, content);
+    public ResponseEntity<PostReplyResponse> postReply(Long postId, String content, String username) {
+        return postCommandService.postReply(postId, content, username);
     }
 
 }

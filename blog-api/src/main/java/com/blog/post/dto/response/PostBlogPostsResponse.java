@@ -12,6 +12,7 @@ public record PostBlogPostsResponse (
         String title,
         String description,
         LocalDateTime lastBuildTime,
+        Long userId,
         List<Reply> replies
 ){
 }

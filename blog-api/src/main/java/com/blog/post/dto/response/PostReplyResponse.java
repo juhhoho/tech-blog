@@ -7,6 +7,7 @@ import lombok.Builder;
 public record PostReplyResponse (
         Long postId,
         Long replyId,
+        Long userId,
         String content
 ){
 }
