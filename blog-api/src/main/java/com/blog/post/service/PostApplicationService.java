@@ -1,6 +1,6 @@
 package com.blog.post.service;
 
-import com.blog.politicsnews.dto.response.PageResult;
+import com.blog.pagination.PageResult;
 import com.blog.post.dto.response.GetBlogPostsResponse;
 import com.blog.post.dto.response.GetOneBlogPostResponse;
 import com.blog.post.dto.response.PostBlogPostsResponse;
@@ -17,8 +17,8 @@ public class PostApplicationService {
     private final PostCommandService postCommandService;
     private final PostQueryService postQueryService;
 
-    public PageResult<GetBlogPostsResponse> getBlogPosts(int page, int size) {
-        return postQueryService.getBlogPosts(page, size);
+    public PageResult<GetBlogPostsResponse> getAllBlogPosts(int page, int size) {
+        return postQueryService.getAllBlogPosts(page, size);
     }
 
     public ResponseEntity<PostBlogPostsResponse> postBlogPosts(String title, String description, String username) {
@@ -31,6 +31,10 @@ public class PostApplicationService {
 
     public ResponseEntity<PostReplyResponse> postReply(Long postId, String content, String username) {
         return postCommandService.postReply(postId, content, username);
+    }
+
+    public PageResult<GetBlogPostsResponse> getSomeBlogPosts(int page, int size, String title, String description) {
+        return postQueryService.getSomeBlogPosts(page, size, title, description);
     }
 
 }

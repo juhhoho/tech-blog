@@ -1,4 +1,4 @@
-package com.blog.politicsnews.dto.response;
+package com.blog.pagination;
 
 import java.util.List;
 

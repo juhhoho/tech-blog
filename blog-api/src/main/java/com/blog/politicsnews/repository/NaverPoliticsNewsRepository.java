@@ -3,7 +3,7 @@ package com.blog.politicsnews.repository;
 import com.blog.Item;
 import com.blog.NaverNewsResponse;
 import com.blog.feign.NaverClient;
-import com.blog.politicsnews.dto.response.PageResult;
+import com.blog.pagination.PageResult;
 import com.blog.politicsnews.dto.response.SearchResponse;
 import com.blog.util.DateUtils;
 import lombok.RequiredArgsConstructor;

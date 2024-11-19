@@ -2,7 +2,7 @@ package com.blog.politicsnews.controller;
 
 import com.blog.politicsnews.dto.request.QueryStatsRequest;
 import com.blog.politicsnews.dto.request.SearchRequest;
-import com.blog.politicsnews.dto.response.PageResult;
+import com.blog.pagination.PageResult;
 import com.blog.politicsnews.dto.response.SearchResponse;
 import com.blog.politicsnews.dto.response.StatResponse;
 import com.blog.politicsnews.service.PoliticsNewsApplicationService;

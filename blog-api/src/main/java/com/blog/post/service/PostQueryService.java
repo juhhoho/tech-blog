@@ -1,12 +1,15 @@
 package com.blog.post.service;
-import com.blog.oauth2.repository.UserRepository;
-import com.blog.politicsnews.dto.response.PageResult;
+import com.blog.pagination.PageResult;
+import com.blog.pagination.PaginateUtils;
 import com.blog.post.dto.response.GetBlogPostsResponse;
 import com.blog.post.dto.response.GetOneBlogPostResponse;
 import com.blog.post.entity.Post;
 import com.blog.post.repository.PostRepository;
+import com.blog.post.repository.PostSpecRepository;
+import com.blog.post.specification.PostSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -19,28 +22,14 @@ import java.util.Optional;
 public class PostQueryService {
 
     private final PostRepository postRepository;
+    private final PostSpecRepository postSpecRepository;
 
     // post 페이징 결과 반환
-    public PageResult<GetBlogPostsResponse> getBlogPosts(int page, int size) {
-        log.info("[PostQueryService - getBlogPosts] page = {}, size = {}", page, size);
+    public PageResult<GetBlogPostsResponse> getAllBlogPosts(int page, int size) {
+        log.info("[PostQueryService - getAllBlogPosts] page = {}, size = {}", page, size);
 
         List<Post> blogPosts = postRepository.findAllByOrderByLastBuildTimeDesc();
-        int totalElements = blogPosts.size();
-        int startIndex = (page - 1) * size;
-        int endIndex = Math.min(startIndex + size, totalElements);
-
-        // 페이지네이션 범위가 올바른지 확인
-        if (startIndex >= totalElements) {
-            // 범위를 벗어난 경우 빈 리스트 반환
-            return new PageResult<>(page, size, totalElements, List.of());
-        }
-
-        // 필요한 데이터 추출 및 변환
-        List<GetBlogPostsResponse> contents = blogPosts.subList(startIndex, endIndex).stream()
-                .map(GetBlogPostsResponse::convertToGetBlogPostsResponse)
-                .toList();
-
-        return new PageResult<>(page, size, totalElements, contents);
+        return PaginateUtils.paginate(blogPosts, page, size, GetBlogPostsResponse::convertToGetBlogPostsResponse);
     }
 
 
@@ -60,5 +49,26 @@ public class PostQueryService {
         return ResponseEntity.notFound().build();
     }
 
+
+    // post 페이징 결과 반환
+    public PageResult<GetBlogPostsResponse> getSomeBlogPosts(int page, int size, String title, String description) {
+        log.info("[PostViewService - getSomeBlogPosts] page = {}, size = {}, title = {}, description = {}", page, size, title, description);
+
+        // Specification을 사용하여 검색 조건 생성
+        Specification<Post> spec = Specification.where(null);
+
+        if (title != null && !title.isBlank()) {
+            spec = spec.and(PostSpecification.searchTypeTitle(title));
+        }
+        if (description != null && !description.isBlank()) {
+            spec = spec.and(PostSpecification.searchDescription(description));
+        }
+
+        // 조건에 따라 검색된 모든 결과 가져오기
+        List<Post> blogPosts = postSpecRepository.findAll(spec);
+
+        return PaginateUtils.paginate(blogPosts, page, size, GetBlogPostsResponse::convertToGetBlogPostsResponse);
+
+    }
 
 }

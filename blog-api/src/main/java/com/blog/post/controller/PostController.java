@@ -1,8 +1,9 @@
 package com.blog.post.controller;
 
 import com.blog.oauth2.jwt.JWTUtil;
-import com.blog.politicsnews.dto.response.PageResult;
-import com.blog.post.dto.request.GetBlogPostsRequest;
+import com.blog.pagination.PageResult;
+import com.blog.post.dto.request.GetSomeBlogPostsRequest;
+import com.blog.post.dto.request.PaginationRequest;
 import com.blog.post.dto.request.PostBlogPostsRequest;
 import com.blog.post.dto.request.PostReplyRequest;
 import com.blog.post.dto.response.GetBlogPostsResponse;
@@ -26,9 +27,9 @@ public class PostController {
     private final JWTUtil jwtUtil;
 
     @GetMapping("/posts")
-    public PageResult<GetBlogPostsResponse> getBlogPosts(@Valid GetBlogPostsRequest getBlogPostsRequest){
-        log.info("[PostController - getBlogPosts] getBlogPostsRequest = {}", getBlogPostsRequest);
-        return postApplicationService.getBlogPosts(getBlogPostsRequest.getPage(), getBlogPostsRequest.getSize());
+    public PageResult<GetBlogPostsResponse> getAllBlogPosts(@Valid PaginationRequest paginationRequest){
+        log.info("[PostController - getBlogPosts] paginationRequest = {}", paginationRequest);
+        return postApplicationService.getAllBlogPosts(paginationRequest.getPage(), paginationRequest.getSize());
     }
 
     @PostMapping("/posts")
@@ -51,4 +52,12 @@ public class PostController {
         log.info("[PostController - postReply] post_id = {}, postReplyRequest = {}, username = {}", postId, postReplyRequest, jwtUtil.getUsernameFromCookies(request));
         return postApplicationService.postReply(postId, postReplyRequest.getContent(), jwtUtil.getUsernameFromCookies(request));
     }
+
+    @GetMapping("/search")
+    public PageResult<GetBlogPostsResponse> getSomeBlogPosts(@Valid PaginationRequest paginationRequest,
+                                                             @RequestBody GetSomeBlogPostsRequest getSomeBlogPostsRequest){
+        log.info("[PostController - getSomeBlogPosts] paginationRequest = {}, getSomeBlogPostsRequest = {}", paginationRequest, getSomeBlogPostsRequest);
+        return postApplicationService.getSomeBlogPosts(paginationRequest.getPage(), paginationRequest.getSize(), getSomeBlogPostsRequest.getTitle(), getSomeBlogPostsRequest.getDescription());
+    }
 }
+

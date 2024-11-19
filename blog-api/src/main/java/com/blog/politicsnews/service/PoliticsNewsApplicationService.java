@@ -1,6 +1,6 @@
 package com.blog.politicsnews.service;
 
-import com.blog.politicsnews.dto.response.PageResult;
+import com.blog.pagination.PageResult;
 import com.blog.politicsnews.dto.response.SearchResponse;
 import com.blog.politicsnews.dto.response.StatResponse;
 import com.blog.politicsnews.entity.DailyStat;

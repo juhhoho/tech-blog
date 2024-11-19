@@ -1,6 +1,6 @@
 package com.blog.politicsnews.repository;
 
-import com.blog.politicsnews.dto.response.PageResult;
+import com.blog.pagination.PageResult;
 import com.blog.politicsnews.dto.response.SearchResponse;
 import org.springframework.data.repository.query.Param;
 
