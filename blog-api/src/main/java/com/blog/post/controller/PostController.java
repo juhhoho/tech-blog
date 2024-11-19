@@ -3,8 +3,11 @@ package com.blog.post.controller;
 import com.blog.politicsnews.dto.response.PageResult;
 import com.blog.post.dto.request.GetBlogPostsRequest;
 import com.blog.post.dto.request.PostBlogPostsRequest;
+import com.blog.post.dto.request.PostReplyRequest;
 import com.blog.post.dto.response.GetBlogPostsResponse;
+import com.blog.post.dto.response.GetOneBlogPostResponse;
 import com.blog.post.dto.response.PostBlogPostsResponse;
+import com.blog.post.dto.response.PostReplyResponse;
 import com.blog.post.service.PostApplicationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +29,20 @@ public class PostController {
     }
 
     @PostMapping("/posts")
-    public ResponseEntity<PostBlogPostsResponse> postBlogPosts(@RequestBody PostBlogPostsRequest postBlogPostsRequest){
+    public ResponseEntity<PostBlogPostsResponse> postBlogPosts(@Valid @RequestBody PostBlogPostsRequest postBlogPostsRequest){
         log.info("[PostController - postBlogPosts] postBlogPostsRequest = {}", postBlogPostsRequest);
         return postApplicationService.postBlogPosts(postBlogPostsRequest.getTitle(), postBlogPostsRequest.getDescription());
+    }
+
+    @GetMapping("/posts/{post_id}")
+    public ResponseEntity<GetOneBlogPostResponse> getOneBlogPost(@PathVariable("post_id") Long postId){
+        log.info("[PostController - getBlogPosts] post_id = {}", postId);
+        return postApplicationService.getOneBlogPosts(postId);
+    }
+
+    @PostMapping("/posts/{post_id}/reply")
+    public ResponseEntity<PostReplyResponse> postReply(@PathVariable("post_id") Long postId, @Valid @RequestBody PostReplyRequest postReplyRequest){
+        log.info("[PostController - postReply] post_id = {}, postReplyRequest = {}", postId, postReplyRequest);
+        return postApplicationService.postReply(postId, postReplyRequest.getContent());
     }
 }

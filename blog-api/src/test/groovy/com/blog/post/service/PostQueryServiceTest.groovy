@@ -21,7 +21,7 @@ class PostQueryServiceTest extends Specification {
         def givenSize = 3
 
         def mockPosts = [
-                new Post("ex_title1","ex_description1", LocalDateTime.now()),
+                new Post("ex_title1","ex_description1", LocalDateTime.now(), ),
                 new Post("ex_title2","ex_description2", LocalDateTime.now().minusMinutes(10)),
                 new Post("ex_title3","ex_description3", LocalDateTime.now().minusMinutes(20))
         ]
@@ -38,17 +38,19 @@ class PostQueryServiceTest extends Specification {
         result.contents().size() == mockPosts.size()
 
         and: "각 Post가 올바르게 변환되었는지 확인"
-        result.contents()[0].title() == mockPosts[0].title
-        result.contents()[0].description() == mockPosts[0].description
-        result.contents()[0].lastBuildTime() == mockPosts[0].lastBuildTime
+        result.contents()[0].title == mockPosts[0].title
+        result.contents()[0].description == mockPosts[0].description
+        result.contents()[0].lastBuildTime == mockPosts[0].lastBuildTime
 
-        result.contents()[1].title() == mockPosts[1].title
-        result.contents()[1].description() == mockPosts[1].description
-        result.contents()[1].lastBuildTime() == mockPosts[1].lastBuildTime
+        result.contents()[1].title == mockPosts[1].title
+        result.contents()[1].description == mockPosts[1].description
+        result.contents()[1].lastBuildTime == mockPosts[1].lastBuildTime
 
-        result.contents()[2].title() == mockPosts[2].title
-        result.contents()[2].description() == mockPosts[2].description
-        result.contents()[2].lastBuildTime() == mockPosts[2].lastBuildTime
+        result.contents()[2].title == mockPosts[2].title
+        result.contents()[2].description == mockPosts[2].description
+        result.contents()[2].lastBuildTime == mockPosts[2].lastBuildTime
+
+        print "${result.contents()[0]}"
 
     }
 }

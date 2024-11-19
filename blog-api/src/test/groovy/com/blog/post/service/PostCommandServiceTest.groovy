@@ -1,7 +1,9 @@
 package com.blog.post.service
 
 import com.blog.post.entity.Post
+import com.blog.post.entity.Reply
 import com.blog.post.repository.PostRepository
+import com.blog.post.repository.ReplyRepository
 import org.springframework.http.HttpStatus
 import spock.lang.Specification
 
@@ -11,9 +13,10 @@ class PostCommandServiceTest extends Specification {
     PostCommandService postCommandService
 
     PostRepository postRepository = Mock()
+    ReplyRepository replyRepository = Mock()
 
     void setup(){
-        postCommandService = new PostCommandService(postRepository)
+        postCommandService = new PostCommandService(postRepository, replyRepository)
     }
 
     def "postBlogPosts 메서드는 블로그 게시글을 저장하고 ResponseEntity<PostBlogPostsResponse>를 반환한다."() {
@@ -41,6 +44,35 @@ class PostCommandServiceTest extends Specification {
             title()  == "ex_title1"
             description() == "ex_description1"
             lastBuildTime() == LocalDateTime.of(2024, 1, 1, 1, 1, 1)
+        }
+    }
+
+    def "postReply 메서드는 댓글을 작성하고 ResponseEntity<PostReplyResponse>를 반환"(){
+        given:
+        def givenPost = Post.builder()
+                .title("ex_title")
+                .description("ex_desc")
+                .lastBuildTime(LocalDateTime.now()).build()
+
+        givenPost.setIdForTest(1L)
+
+        def givenReply = Reply.builder()
+                .content("ex_content")
+                .post(givenPost).build()
+
+        postRepository.findById(*_) >> Optional.of(givenPost)
+        replyRepository.saveAndFlush(*_) >> givenReply
+
+        when:
+        def result = postCommandService.postReply(1l, "ex_content")
+
+        then:
+        verifyAll (result){
+            statusCode == HttpStatus.CREATED
+            with(body){
+                postId() == 1L
+                content() == "ex_content"
+            }
         }
     }
 

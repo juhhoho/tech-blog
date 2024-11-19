@@ -1,5 +1,6 @@
 package com.blog.post.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -7,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "blog_post")
@@ -26,6 +29,9 @@ public class Post {
 
     @Column(name = "lastBuildTime")
     private LocalDateTime lastBuildTime;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    private List<Reply> replies = new ArrayList<>();
 
     @Builder
     public Post(String title, String description, LocalDateTime lastBuildTime) {

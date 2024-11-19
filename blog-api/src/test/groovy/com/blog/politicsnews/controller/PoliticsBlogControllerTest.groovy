@@ -26,7 +26,7 @@ class PoliticsBlogControllerTest extends Specification {
 
         when:
         def response = mockMvc
-                .perform(MockMvcRequestBuilders.get("/v1/blog/news?page=${givenPage}&size=${givenSize}"))
+                .perform(MockMvcRequestBuilders.get("/v1/blog/news?query=${givenQuery}&page=${givenPage}&size=${givenSize}"))
                 .andReturn()
                 .response
 

@@ -46,4 +46,21 @@ class PostApplicationServiceTest extends Specification {
                 assert size == givenSize
         }
     }
+
+    def "postReply 인자를 수정없이 넘겨준다."(){
+        given:
+        def givenPostId = 1L
+        def givenContent = "ex_content"
+
+        when:
+        postApplicationService.postReply(givenPostId, givenContent)
+
+        then:
+        1 * postCommandService.postReply(givenPostId, givenContent) >> {
+            Long postId, String content ->
+                assert postId == givenPostId
+                assert content == givenContent
+        }
+    }
+
 }
