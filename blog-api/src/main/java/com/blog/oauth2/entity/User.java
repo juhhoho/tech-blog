@@ -1,7 +1,6 @@
 package com.blog.oauth2.entity;
 
-import com.blog.post.entity.Post;
-import com.blog.post.entity.Reply;
+import com.blog.post.entity.Feed;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -32,7 +31,7 @@ public class User {
     private String role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Post> posts = new ArrayList<>();
+    private List<Feed> feeds = new ArrayList<>();
 
 
     @Builder

@@ -8,30 +8,26 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Entity
-@Table(name = "blog_feed_reply")
+@Table(name = "blog_feed_recommendation")
 @ToString
 @NoArgsConstructor
 @Getter
-public class Reply {
+public class Recommend {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(name = "content")
-    private String content;
-
-    @ManyToOne
-    @JoinColumn(name="post_id")
-    private Feed feed;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
+    @ManyToOne
+    @JoinColumn(name = "feed_id")
+    private Feed feed;
+
     @Builder
-    public Reply(String content, Feed feed, User user) {
-        this.content = content;
-        this.feed = feed;
+    public Recommend(User user, Feed feed) {
         this.user = user;
+        this.feed = feed;
     }
 }

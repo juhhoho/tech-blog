@@ -1,7 +1,7 @@
 package com.blog.feign;
 
 import com.blog.NaverErrorResponse;
-import com.blog.exception.ApiException;
+import com.blog.exception.CustomException.ApiException;
 import com.blog.exception.ErrorType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Response;

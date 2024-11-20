@@ -1,0 +1,16 @@
+package com.blog.post.dto.except;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
+@Builder
+public class UserDtoExceptFeeds {
+    private Long id;
+    private String userName;
+    private String name;
+    private String email;
+    private String role;
+}
