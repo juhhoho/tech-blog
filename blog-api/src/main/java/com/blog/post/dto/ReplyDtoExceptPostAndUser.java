@@ -2,11 +2,10 @@ package com.blog.post.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
 @AllArgsConstructor
-public class ReplyDto {
+public class ReplyDtoExceptPostAndUser {
     private Long id;
     private String content;
 

@@ -1,6 +1,6 @@
 package com.blog.post.dto.response;
 
-import com.blog.post.dto.ReplyDto;
+import com.blog.post.dto.ReplyDtoExceptPostAndUser;
 import com.blog.post.entity.Post;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,11 +15,11 @@ public class GetBlogPostsResponse {
     private String title;
     private String description;
     private LocalDateTime lastBuildTime;
-    private List<ReplyDto> replies;
+    private List<ReplyDtoExceptPostAndUser> replies;
 
     public static GetBlogPostsResponse convertToGetBlogPostsResponse(Post post) {
-        List<ReplyDto> replies = post.getReplies().stream()
-                .map(reply -> new ReplyDto(reply.getId(), reply.getContent()))
+        List<ReplyDtoExceptPostAndUser> replies = post.getReplies().stream()
+                .map(reply -> new ReplyDtoExceptPostAndUser(reply.getId(), reply.getContent()))
                 .toList();
 
         return new GetBlogPostsResponse(post.getId(), post.getTitle(), post.getDescription(), post.getLastBuildTime(), replies);
