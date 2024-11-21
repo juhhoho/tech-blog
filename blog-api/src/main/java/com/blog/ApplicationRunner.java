@@ -87,7 +87,7 @@ public class ApplicationRunner implements CommandLineRunner {
         Feed feed9 = new Feed("title9", "desc9",LocalDateTime.now().minusDays(8),user2,2);
         Feed feed10 = new Feed("title10", "desc10",LocalDateTime.now().minusDays(9),user2,2);
 
-        feedRepository.saveAll(List.of(feed1, feed2, feed3, feed4, feed5, feed6, feed7, feed8, feed9, feed10));
+        feedRepository.saveAllAndFlush(List.of(feed1, feed2, feed3, feed4, feed5, feed6, feed7, feed8, feed9, feed10));
 
         Recommend recommend1 = Recommend.builder().feed(feed8).user(user1).build();
         Recommend recommend2 = Recommend.builder().feed(feed9).user(user1).build();

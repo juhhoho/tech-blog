@@ -42,6 +42,11 @@ public class Feed {
     @Column(name = "likeCount", nullable = false)
     private int likeCount;
 
+    @ColumnDefault("0")
+    @Column(name = "viewCount", nullable = false)
+    private int viewCount = 0;
+
+
     @Builder
     public Feed(String title, String description, LocalDateTime lastBuildTime, User user, int likeCount) {
         this.title = title;
@@ -53,5 +58,9 @@ public class Feed {
 
     public void setIdForTest(Long id){
         this.id = id;
+    }
+
+    public static void viewCountUp(Feed feed) {
+        feed.viewCount++;
     }
 }

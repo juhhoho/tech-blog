@@ -5,6 +5,8 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @Repository
 public class FeedCommandRepositoryImpl implements FeedCommandRepository {
@@ -27,5 +29,21 @@ public class FeedCommandRepositoryImpl implements FeedCommandRepository {
         entityManager.createQuery(jpql)
                 .setParameter("feed", feed)
                 .executeUpdate();
+    }
+
+    @Override
+    public List<Feed> getAllNFeedsByMostLiked(int count) {
+        String jpql = "SELECT f FROM Feed f ORDER BY f.likeCount DESC"; // likeCount 기준 내림차순 정렬
+        return entityManager.createQuery(jpql, Feed.class)
+                .setMaxResults(count) // 반환할 최대 개수 설정
+                .getResultList(); // 결과 가져오기
+    }
+
+    @Override
+    public List<Feed> getAllNFeedsByMostViewed(int count) {
+        String jpql = "SELECT f FROM Feed f ORDER BY f.viewCount DESC"; // viewCount 기준 내림차순 정렬
+        return entityManager.createQuery(jpql, Feed.class)
+                .setMaxResults(count) // 반환할 최대 개수 설정
+                .getResultList(); // 결과 가져오기
     }
 }
