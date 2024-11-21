@@ -12,6 +12,7 @@ import java.util.List;
 
 @Getter
 @AllArgsConstructor
+@Builder
 public class GetOneBlogFeedResponse {
     private Long id;
     private String title;
@@ -19,16 +20,6 @@ public class GetOneBlogFeedResponse {
     private LocalDateTime lastBuildTime;
     private UserDtoExceptFeeds user;
     private List<ReplyDtoExceptFeedAndUser> replies;
-
-
-    @Builder
-    public GetOneBlogFeedResponse(String title, String description, LocalDateTime lastBuildTime, UserDtoExceptFeeds user, List<ReplyDtoExceptFeedAndUser> replies) {
-        this.title = title;
-        this.description = description;
-        this.lastBuildTime = lastBuildTime;
-        this.user = user;
-        this.replies = replies;
-    }
 
 
 

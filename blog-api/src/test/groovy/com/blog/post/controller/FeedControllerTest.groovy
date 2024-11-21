@@ -1,10 +1,15 @@
 package com.blog.post.controller
 
 import com.blog.oauth2.jwt.JWTUtil
+import com.blog.post.dto.except.ReplyDtoExceptFeedAndUser
+import com.blog.post.dto.except.UserDtoExceptFeeds
+import com.blog.post.dto.request.MakeBlogFeedRequest
 import com.blog.post.dto.response.GetOneBlogFeedResponse
 import com.blog.post.dto.response.MakeBlogFeedResponse
 import com.blog.post.dto.response.MakeReplyResponse
 import com.blog.post.service.feed.FeedApplicationService
+import jakarta.servlet.http.Cookie
+import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -16,108 +21,133 @@ import spock.lang.Specification
 import java.time.LocalDateTime
 
 class FeedControllerTest extends Specification{
-    FeedController postController
+    FeedController feedController
 
-    FeedApplicationService postApplicationService = Mock()
+    FeedApplicationService feedApplicationService = Mock()
     JWTUtil jwtUtil = Mock()
     MockMvc mockMvc
 
-
-
     void setup(){
-        postController = new FeedController(postApplicationService, jwtUtil)
-        mockMvc = MockMvcBuilders.standaloneSetup(postController).build()
+        feedController = new FeedController(feedApplicationService, jwtUtil)
+        mockMvc = MockMvcBuilders.standaloneSetup(feedController).build()
     }
 
-    def "[GET] 컨트롤러의 getBlogPosts 메서드가 정상적으로 동작한다."(){
+    def "[GET] getAllBlogFeeds - page,size를 줄 때 정상적으로 동작한다."() {
         given:
         def givenPage = 1
         def givenSize = 1
 
-        when:
+        when: "page와 size를 줄 때"
         def response = mockMvc
-                .perform(MockMvcRequestBuilders.get("/v1/blog/posts?page=${givenPage}&size=${givenSize}"))
+                .perform(MockMvcRequestBuilders.get("/v1/blog/feeds?page=${givenPage}&size=${givenSize}"))
                 .andReturn()
                 .response
-
 
         then:
         response.status == HttpStatus.OK.value()
 
         and:
-        1 * postApplicationService.getBlogPosts(*_) >> {
+        1 * feedApplicationService.getAllBlogFeeds(*_) >> {
             int page, int size ->
                 assert page == givenPage
                 assert size == givenSize
         }
     }
 
-    def "[POST] 컨트롤러의 postBlogPosts 메서드가 정상적으로 동작한다."() {
+
+    def "[GET] getAllBlogFeeds - page,size를 주지 않을 떄 때 디폴트 값으로 정상적으로 동작한다."(){
+        given:
+        def defaultPage = 1
+        def defaultSize = 5
+
+        when: "page와 size를 줄 때"
+        def response = mockMvc
+                .perform(MockMvcRequestBuilders.get("/v1/blog/feeds"))
+                .andReturn()
+                .response
+        then:
+        response.status == HttpStatus.OK.value()
+
+        and:
+        1 * feedApplicationService.getAllBlogFeeds(*_) >> {
+            int page, int size ->
+                assert page == defaultPage
+                assert size == defaultSize
+        }
+    }
+
+
+    def "[POST] makeBlogFeed - 정상적으로 동작한다."() {
         given:
         def givenTitle = "ex_title"
         def givenDescription = "ex_description"
+
+        def request = MakeBlogFeedRequest.builder()
+                .title(givenTitle)
+                .description(givenDescription)
+                .build()
+
         def givenUsername = "ex_username"
-        def givenAuthHeader = "ex_header"
-        def givenName = "ex_name"
+        def givenUserId = 1L
+        def givenLikeCount = 1
+        def fixedTime = LocalDateTime.of(2024, 11, 21, 10, 0)
+
         def expectedResponse = MakeBlogFeedResponse.builder()
                 .id(1L)
                 .title(givenTitle)
                 .description(givenDescription)
-                .lastBuildTime(LocalDateTime.now())
-                .name(givenName)
+                .lastBuildTime(fixedTime)
+                .userId(givenUserId)
+                .likeCount(givenLikeCount)
                 .build()
 
         // 서비스 계층의 Mock 동작 설정
-        postApplicationService.postBlogPosts(givenTitle, givenDescription,givenUsername) >> ResponseEntity
+        feedApplicationService.makeBlogFeed(request.title, request.description, givenUsername) >> ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(expectedResponse)
 
-        jwtUtil.getUsernameFromAuthorizationHeader(givenAuthHeader) >> givenUsername
+        jwtUtil.getUsernameFromCookies(_ as HttpServletRequest) >> givenUsername
 
         when:
-        def response = mockMvc.perform(MockMvcRequestBuilders.post("/v1/blog/posts")
+        def response = mockMvc.perform(MockMvcRequestBuilders.post("/v1/blog/feeds")
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", "${givenAuthHeader}")
+                .header("Authorization", "asdas")
                 .content("""
-                    {
-                        "title": "${givenTitle}",
-                        "description": "${givenDescription}"
-                    }
-                """))
+                {
+                    "title": "${givenTitle}",
+                    "description": "${givenDescription}"
+                }
+            """))
                 .andReturn()
                 .response
-
 
         then:
         response.status == HttpStatus.OK.value()
 
         and:
-        1 * postApplicationService.postBlogPosts(givenTitle, givenDescription, givenUsername) >>{
-            String title, String description, String username ->
-                assert title == givenTitle
-                assert description == givenDescription
-                assert username == givenUsername
-        }
+        1 * feedApplicationService.makeBlogFeed(givenTitle, givenDescription, givenUsername)
     }
 
-    def "[GET] 컨트롤러의 getOneBlogPost 메서드가 정상적으로 동작한다."() {
+    def "[GET] 컨트롤러의 getOneBlogFeed - 정상적으로 동작한다."() {
         given:
         def givenPostId = 1L
 
         def expectedResponse = GetOneBlogFeedResponse.builder()
+                .id(givenPostId)
                 .title("ex_title")
                 .description("ex_description")
                 .lastBuildTime(LocalDateTime.now())
-                //.replies()
+                .user(new UserDtoExceptFeeds(1l, "qwe","asd","zxc","qaz"))
+                .replies(List.of(new ReplyDtoExceptFeedAndUser(1l, "asd")))
                 .build()
 
         // 서비스 계층의 Mock 동작 설정
-        postApplicationService.getOneBlogPosts(givenPostId) >> ResponseEntity
+        feedApplicationService.getOneBlogFeed(givenPostId) >> ResponseEntity
                 .ok()
                 .body(expectedResponse)
 
         when:
-        def response = mockMvc.perform(MockMvcRequestBuilders.get("/v1/blog/posts/${givenPostId}")
+        def response = mockMvc.perform(MockMvcRequestBuilders.get("/v1/blog/feeds/${givenPostId}")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .response
@@ -126,43 +156,12 @@ class FeedControllerTest extends Specification{
         response.status == HttpStatus.OK.value()
 
         and:
-        1 * postApplicationService.getOneBlogPosts(givenPostId) >> {
+        1 * feedApplicationService.getOneBlogFeed(givenPostId) >> {
             Long postId ->
                 assert postId == givenPostId
         }
     }
 
-    def "[POST] 컨트롤러의 postReply 메서드가 정상적으로 동작한다."(){
-        given:
-        def givenPostId = 1l
-        def givenReplyId = 1L
-        def givenContent = "ex_content"
-
-        def expectedResponse = MakeReplyResponse.builder()
-                .postId(givenPostId)
-                .replyId(givenReplyId)
-                .content(givenContent)
-                .build()
-
-        // 서비스 계층의 Mock 동작 설정
-        postApplicationService.postReply(givenPostId, givenContent) >> ResponseEntity
-                                                                        .status(HttpStatus.CREATED)
-                                                                        .body(expectedResponse)
-
-        when:
-        def response = mockMvc.perform(MockMvcRequestBuilders.post("/v1/blog/posts/${givenPostId}/reply")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                    {
-                        "content" : "${givenContent}"
-                    }
-                """))
-                .andReturn()
-                .response
-        then:
-        response.status == HttpStatus.CREATED.value()
-
-    }
 
 
 

@@ -7,27 +7,28 @@ import spock.lang.Specification
 
 class FeedApplicationServiceTest extends Specification {
 
-    FeedApplicationService postApplicationService
+    FeedApplicationService feedApplicationService
 
-    FeedCommandService postCommandService = Mock()
-    FeedQueryService postQueryService = Mock()
+    FeedCommandService feedCommandService = Mock()
+    FeedQueryService feedQueryService = Mock()
 
     void setup(){
-        postApplicationService = new FeedApplicationService(postCommandService, postQueryService)
+        feedApplicationService = new FeedApplicationService(feedCommandService, feedQueryService)
     }
 
     def "postBlogPosts 인자를 수정없이 넘겨준다."(){
         given:
         def givenTitle = "ex_title"
         def givenDescription = "ex_description"
+        def givenUsername = "qwer"
 
 
         when:
-        postApplicationService.postBlogPosts(givenTitle, givenDescription)
+        feedApplicationService.makeBlogFeed(givenTitle, givenDescription, givenUsername)
 
         then:
-        1 * postCommandService.postBlogPosts(*_) >>{
-            String title, String description ->
+        1 * feedCommandService.makeBlogFeed(*_) >>{
+            String title, String description, String username ->
                 assert title == givenTitle
                 assert description == givenDescription
         }

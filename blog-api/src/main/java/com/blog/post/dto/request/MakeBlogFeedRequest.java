@@ -1,15 +1,13 @@
 package com.blog.post.dto.request;
 
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 @Getter
 @ToString
 @Setter
 @AllArgsConstructor
+@Builder
 public class MakeBlogFeedRequest {
     // 50자
     @NotBlank(message = "입력은 비어있을 수 없습니다.")
