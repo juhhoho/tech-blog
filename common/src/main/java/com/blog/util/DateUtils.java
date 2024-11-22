@@ -1,6 +1,7 @@
 package com.blog.util;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -15,5 +16,8 @@ public class DateUtils {
 
     public static LocalDate parseDateWithTimeZone(String date) {
         return OffsetDateTime.parse(date, DATE_WITH_TIMEZONE_FORMATTER).toLocalDate();
+    }
+    public static String formatLocalDateTimeToYYYYMMDD(LocalDateTime dateTime) {
+        return dateTime.format(YYYYMMDD_FORMATTER);
     }
 }

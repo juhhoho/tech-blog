@@ -6,7 +6,7 @@ import spock.lang.Specification
 
 import java.time.LocalDateTime
 
-class DailyStatCommandServiceTest extends Specification {
+class StatCommandServiceTest extends Specification {
     DailyStatCommandService dailyStatCommandService
 
     DailyStatRepository dailyStatRepository = Mock()

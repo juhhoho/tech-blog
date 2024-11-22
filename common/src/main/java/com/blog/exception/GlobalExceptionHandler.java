@@ -1,6 +1,7 @@
 package com.blog.exception;
 
 import com.blog.exception.CustomException.ApiException;
+import com.blog.exception.CustomException.ForbiddenAccessException;
 import com.blog.exception.CustomException.NoResourceFoundException;
 import com.blog.exception.CustomException.RecommendException;
 import lombok.extern.slf4j.Slf4j;
@@ -62,6 +63,18 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(new ErrorResponse(e.getErrorMessage(), ErrorType.RESOURCE_NOT_FOUND));
+    }
+
+    /*
+    사용자가 접근 권한이 없는 컨텐츠에 접근했을 때 사용
+    서버가 사용자의 요청을 이해했지만 권한이 부족한 경우
+    */
+    @ExceptionHandler(ForbiddenAccessException.class)
+    public ResponseEntity<ErrorResponse> handleNoAuthContentException(ForbiddenAccessException e){
+        log.error("No Authentication Exception for Content occurred. message = {}, className = {}", e.getMessage(), e.getClass().getName());
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(new ErrorResponse(e.getErrorMessage(), ErrorType.FORBIDDEN_ACCESS));
     }
 
 

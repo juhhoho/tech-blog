@@ -2,18 +2,26 @@ package com.blog.post.service.recommend;
 
 import com.blog.post.dto.response.LikeFeedResponse;
 import com.blog.post.dto.response.UnlikeFeedResponse;
+import com.blog.post.service.stat.StatCommandService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class RecommendApplicationService {
     private final RecommendCommandService recommendCommandService;
+    private final StatCommandService statCommandService;
 
-    public ResponseEntity<LikeFeedResponse> likeFeed(Long feedId, String username) {
+    public ResponseEntity<LikeFeedResponse> likeFeed(Long feedId, String username, LocalDateTime likeDateTime) {
+        // 일간 추천수 집계
+        statCommandService.saveLikeTime(feedId, likeDateTime);
+
+        // 추천
         return recommendCommandService.likeFeed(feedId, username);
     }
 

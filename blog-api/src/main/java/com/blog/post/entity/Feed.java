@@ -28,6 +28,9 @@ public class Feed {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "createTime")
+    private LocalDateTime createTime;
+
     @Column(name = "lastBuildTime")
     private LocalDateTime lastBuildTime;
 
@@ -46,21 +49,31 @@ public class Feed {
     @Column(name = "viewCount", nullable = false)
     private int viewCount = 0;
 
-
     @Builder
-    public Feed(String title, String description, LocalDateTime lastBuildTime, User user, int likeCount) {
+    public Feed(String title, String description, LocalDateTime createTime, LocalDateTime lastBuildTime, User user) {
+        this.title = title;
+        this.description = description;
+        this.createTime = createTime;
+        this.lastBuildTime = lastBuildTime;
+        this.user = user;
+    }
+
+    //----------------------------------------------------------------------------
+    // static -> 인스터스화 x 일 때 사용
+    public static void viewCountUp(Feed feed) {
+        feed.viewCount++;
+    }
+
+    //----------------------------------------------------------------------------
+    // non-static -> 인스터스화일 때 사용
+    public  void updateFeed(String title, String description, LocalDateTime lastBuildTime){
         this.title = title;
         this.description = description;
         this.lastBuildTime = lastBuildTime;
-        this.user = user;
-        this.likeCount = likeCount;
     }
 
     public void setIdForTest(Long id){
         this.id = id;
     }
-
-    public static void viewCountUp(Feed feed) {
-        feed.viewCount++;
-    }
+    //----------------------------------------------------------------------------
 }

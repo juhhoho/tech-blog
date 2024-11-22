@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+
 @RestController
 @RequestMapping("/v1/blog")
 @Slf4j
@@ -17,6 +19,9 @@ import org.springframework.web.bind.annotation.*;
 public class RecommendController {
     private final RecommendApplicationService recommendApplicationService;
     private final JWTUtil jwtUtil;
+    //------------------------------------------------------------------------------------------------------------------
+    // <POST>
+    //------------------------------------------------------------------------------------------------------------------
 
     // 게시글 추천
     @PostMapping("/feeds/{feed_id}/like")
@@ -25,9 +30,12 @@ public class RecommendController {
             HttpServletRequest request)
     {
         log.info("[RecommendController - likeFeed] feedId = {}, username = {}", feedId, jwtUtil.getUsernameFromCookies(request));
-        return recommendApplicationService.likeFeed(feedId, jwtUtil.getUsernameFromCookies(request));
+        return recommendApplicationService.likeFeed(feedId, jwtUtil.getUsernameFromCookies(request), LocalDateTime.now());
     }
 
+    //------------------------------------------------------------------------------------------------------------------
+    // <DELETE>
+    //------------------------------------------------------------------------------------------------------------------
     // 게시글 추천 취소
     @DeleteMapping("/feeds/{feed_id}/unlike")
     public ResponseEntity<UnlikeFeedResponse> unlikeFeed(

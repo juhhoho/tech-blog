@@ -5,18 +5,17 @@ import com.blog.pagination.PaginateUtils;
 import com.blog.post.dto.response.GetBlogFeedsResponse;
 import com.blog.post.dto.response.GetOneBlogFeedResponse;
 import com.blog.post.entity.Feed;
-import com.blog.post.repository.feed.FeedCommandRepository;
 import com.blog.post.repository.feed.FeedRepository;
 import com.blog.post.repository.feed.FeedSpecRepository;
 import com.blog.post.specification.FeedSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,32 +23,13 @@ import java.util.Optional;
 public class FeedQueryService {
 
     private final FeedRepository feedRepository;
-    private final FeedCommandRepository feedCommandRepository;
     private final FeedSpecRepository feedSpecRepository;
 
     // 모든 feeds 페이징 결과 반환
     public PageResult<GetBlogFeedsResponse> getAllBlogFeeds(int page, int size) {
         log.info("[FeedQueryService - getAllBlogFeeds] page = {}, size = {}", page, size);
 
-        List<Feed> blogFeeds = feedRepository.findAllByOrderByLastBuildTimeDesc();
-
-        return PaginateUtils.paginate(blogFeeds, page, size, GetBlogFeedsResponse::convertToGetBlogFeedsResponse);
-    }
-
-    // 추천수 기반 feeds 페이징 결과 반환
-    public PageResult<GetBlogFeedsResponse> getMostLikedBlogFeeds(int page, int size, int count){
-        log.info("[FeedQueryService - getMostLikedBlogFeeds] page = {}, size = {}, count = {}", page, size, count);
-
-        List<Feed> blogFeeds = feedCommandRepository.getAllNFeedsByMostLiked(count);
-
-        return PaginateUtils.paginate(blogFeeds, page, size, GetBlogFeedsResponse::convertToGetBlogFeedsResponse);
-    }
-
-    // 조회수 기반 feeds 페이징 결과 반환
-    public PageResult<GetBlogFeedsResponse> getMostViewedBlogFeeds(int page, int size, int count){
-        log.info("[FeedQueryService - getMostViewedBlogFeeds] page = {}, size = {}, count = {}", page, size, count);
-
-        List<Feed> blogFeeds = feedCommandRepository.getAllNFeedsByMostViewed(count);
+        List<Feed> blogFeeds = feedRepository.findAllByOrderByCreateTimeDescLastBuildTimeDesc();
 
         return PaginateUtils.paginate(blogFeeds, page, size, GetBlogFeedsResponse::convertToGetBlogFeedsResponse);
     }
@@ -68,8 +48,11 @@ public class FeedQueryService {
             spec = spec.and(FeedSpecification.searchDescription(description));
         }
 
-        // 조건에 따라 검색된 모든 결과 가져오기
-        List<Feed> blogFeeds = feedSpecRepository.findAll(spec);
+        // create time -> build time 순으로 정렬 조건 생성
+        Sort sort = Sort.by(Sort.Order.desc("createTime"), Sort.Order.desc("lastBuildTime"));
+
+        // 검색 + 정려 조건에 따라 검색된 모든 결과 가져오기
+        List<Feed> blogFeeds = feedSpecRepository.findAll(spec, sort);
 
         return PaginateUtils.paginate(blogFeeds, page, size, GetBlogFeedsResponse::convertToGetBlogFeedsResponse);
 

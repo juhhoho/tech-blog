@@ -8,7 +8,7 @@ import com.blog.post.dto.response.LikeFeedResponse;
 import com.blog.post.dto.response.UnlikeFeedResponse;
 import com.blog.post.entity.Feed;
 import com.blog.post.entity.Recommend;
-import com.blog.post.repository.feed.FeedCommandRepository;
+import com.blog.post.repository.feed.FeedCustomRepository;
 import com.blog.post.repository.feed.FeedRepository;
 import com.blog.post.repository.recommend.RecommendRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,12 +30,11 @@ public class RecommendCommandService {
     private final UserRepository userRepository;
     private final FeedRepository feedRepository;
 
-    @Qualifier("feedCommandRepositoryImpl")
-    private final FeedCommandRepository feedCommandRepository;
+    @Qualifier("feedCustomRepositoryImpl")
+    private final FeedCustomRepository feedCustomRepository;
 
     public ResponseEntity<LikeFeedResponse> likeFeed(Long feedId, String username){
         log.info("[RecommendCommandService - likeFeed] feedId = {}, username = {}", feedId, username);
-
         Feed feed = feedRepository.findById(feedId).orElseThrow(
                 () -> new NoResourceFoundException(feedId + "를 id 값으로 갖는 feed를 찾을 수 없습니다.")
         );
@@ -56,8 +55,7 @@ public class RecommendCommandService {
         recommendRepository.saveAndFlush(recommend);
 
         // feed에 대해 count + 1, 중복 x
-        feedCommandRepository.addLikeCount(feed);
-
+        feedCustomRepository.addLikeCount(feed);
         LikeFeedResponse likeFeedResponse = LikeFeedResponse.builder()
                 .userId(user.getId())
                 .feedId(feed.getId())
@@ -86,7 +84,7 @@ public class RecommendCommandService {
         recommendRepository.delete(recommend);
 
         // feed에 대해 count - 1, 중복 x
-        feedCommandRepository.subLikeCount(feed);
+        feedCustomRepository.subLikeCount(feed);
 
         UnlikeFeedResponse unlikeFeedResponse = UnlikeFeedResponse.builder()
                 .userId(user.getId())

@@ -3,11 +3,9 @@ package com.blog.post.controller;
 import com.blog.oauth2.jwt.JWTUtil;
 import com.blog.pagination.PageResult;
 import com.blog.post.dto.request.MakeBlogFeedRequest;
-import com.blog.post.dto.response.GetBlogFeedsResponse;
-import com.blog.post.dto.response.GetOneBlogFeedResponse;
-import com.blog.post.dto.response.MakeBlogFeedResponse;
+import com.blog.post.dto.request.UpdateBlogFeedRequest;
+import com.blog.post.dto.response.*;
 import com.blog.post.service.feed.FeedApplicationService;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -28,8 +26,11 @@ public class FeedController {
 
     //------------------------------------------------------------------------------------------------------------------
     // <GET>
+    //------------------------------------------------------------------------------------------------------------------
 
-    // 전체 feeds 조회 + 페이징(page = 1,size = 5) + 최근 게시일 순
+    // 전체 feeds 조회
+    // 페이징(page = 1,size = 5)
+    // 생성 시간 정렬, 만약 생성 시간이 같으면 수정 시간 정렬
     @GetMapping("/feeds")
     public PageResult<GetBlogFeedsResponse> getAllBlogFeeds(
             @RequestParam(defaultValue = "1") @Min(1) @Max(10000) int page,
@@ -39,29 +40,9 @@ public class FeedController {
         return feedApplicationService.getAllBlogFeeds(page, size);
     }
 
-    // 추천 수 기반 feeds 조회 + 페이징(page = 1, size = 5)
-    @GetMapping("/feeds/like/ranking")
-    public PageResult<GetBlogFeedsResponse> getMostLikedBlogFeeds(
-            @RequestParam(defaultValue = "1") @Min(1) @Max(10000) int page,
-            @RequestParam(defaultValue = "5") @Min(1) @Max(50) int size,
-            @RequestParam(defaultValue = "5") @Min(1) @Max(10) int count)
-    {
-        log.info("[FeedController - getMostLikedBlogFeeds] page = {}, size = {}, count = {}", page, size, count);
-        return feedApplicationService.getMostLikedBlogFeeds(page, size, count);
-    }
-
-    // 조회 수 기반 feeds 조회 + 페이징(page = 1, size = 5)
-    @GetMapping("/feeds/view/ranking")
-    public PageResult<GetBlogFeedsResponse> getMostViewedBlogFeeds(
-            @RequestParam(defaultValue = "1") @Min(1) @Max(10000) int page,
-            @RequestParam(defaultValue = "5") @Min(1) @Max(50) int size,
-            @RequestParam(defaultValue = "5") @Min(1) @Max(10) int count)
-    {
-        log.info("[FeedController - getMostViewedBlogFeeds] page = {}, size = {}, count = {}", page, size, count);
-        return feedApplicationService.getMostViewedBlogFeeds(page, size, count);
-    }
-
-    // 키워드 기반 feeds 조회 + 페이징(page = 1, size = 5) + 최근 게시일 순
+    // 키워드 기반 feeds 검색
+    // 페이징(page = 1, size = 5)
+    // 생성 시간 정렬, 만약 생성 시간이 같으면 수정 시간 정렬
     @GetMapping("/feeds/search")
     public PageResult<GetBlogFeedsResponse> getSomeBlogFeeds(
             @RequestParam(defaultValue = "1") @Min(1) @Max(10000) int page,
@@ -74,7 +55,8 @@ public class FeedController {
     }
 
 
-    // feed_id 기반 특정 feed 조회 + 조회 수 카운트
+    // feed의 id값 기반 특정 feed 조회
+    // 조회 수 카운트
     @GetMapping("/feeds/{feed_id}")
     public ResponseEntity<GetOneBlogFeedResponse> getOneBlogFeed(
             @PathVariable("feed_id") Long feedId,
@@ -88,6 +70,7 @@ public class FeedController {
 
     //------------------------------------------------------------------------------------------------------------------
     // <POST>
+    //------------------------------------------------------------------------------------------------------------------
 
     // feed 작성
     @PostMapping("/feeds")
@@ -99,6 +82,34 @@ public class FeedController {
         return feedApplicationService.makeBlogFeed(makeBlogFeedRequest.getTitle(), makeBlogFeedRequest.getDescription(), jwtUtil.getUsernameFromCookies(request));
     }
 
+    //------------------------------------------------------------------------------------------------------------------
+    // <PATCH>
+    //------------------------------------------------------------------------------------------------------------------
+
+    // feed 업데이트
+    @PatchMapping("/feeds/{feed_id}")
+    public ResponseEntity<UpdateBlogFeedResponse> updateBlogFeed(
+            @PathVariable("feed_id") Long feedId,
+            @Valid @RequestBody UpdateBlogFeedRequest updateBlogFeedRequest,
+            HttpServletRequest request)
+    {
+        log.info("[FeedController - updateBlogFeed] feedId = {} updateBlogFeedRequest = {}, username = {}", feedId, updateBlogFeedRequest, jwtUtil.getUsernameFromCookies(request));
+        return feedApplicationService.updateBlogFeed(feedId, updateBlogFeedRequest.getTitle(), updateBlogFeedRequest.getDescription(), jwtUtil.getUsernameFromCookies(request));
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // <DELETE>
+    //------------------------------------------------------------------------------------------------------------------
+
+    // feed 삭제
+    @DeleteMapping("/feeds/{feed_id}")
+    public ResponseEntity<DeleteBlogFeedResponse> deleteBlogFeed(
+            @PathVariable("feed_id") Long feedId,
+            HttpServletRequest request)
+    {
+        log.info("[FeedController - deleteBlogFeed] feedId = {}, username = {}", feedId, jwtUtil.getUsernameFromCookies(request));
+        return feedApplicationService.deleteBlogFeed(feedId, jwtUtil.getUsernameFromCookies(request));
+    }
 
 
 }

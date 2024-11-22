@@ -1,9 +1,12 @@
 package com.blog.post.service.feed;
 
+import com.blog.exception.CustomException.ForbiddenAccessException;
 import com.blog.exception.CustomException.NoResourceFoundException;
 import com.blog.oauth2.entity.User;
 import com.blog.oauth2.repository.UserRepository;
+import com.blog.post.dto.response.DeleteBlogFeedResponse;
 import com.blog.post.dto.response.MakeBlogFeedResponse;
+import com.blog.post.dto.response.UpdateBlogFeedResponse;
 import com.blog.post.entity.Feed;
 import com.blog.post.repository.feed.FeedRepository;
 import jakarta.servlet.http.Cookie;
@@ -17,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
@@ -35,20 +37,20 @@ public class FeedCommandService {
         Feed newFeed = Feed.builder()
                 .title(title)
                 .description(description)
+                .createTime(LocalDateTime.now())
                 .lastBuildTime(LocalDateTime.now())
                 .user(user)
-                .likeCount(0)
                 .build();
+
         Feed savedFeed = feedRepository.saveAndFlush(newFeed);
 
         MakeBlogFeedResponse makeBlogFeedResponse = MakeBlogFeedResponse.builder()
                 .id(savedFeed.getId())
                 .title(savedFeed.getTitle())
                 .description(savedFeed.getDescription())
+                .createTime(savedFeed.getCreateTime())
                 .lastBuildTime(savedFeed.getLastBuildTime())
                 .userId(user.getId())
-                .likeCount(savedFeed.getLikeCount())
-                .replies(new ArrayList<>())
                 .build();
 
         return ResponseEntity
@@ -98,4 +100,61 @@ public class FeedCommandService {
             log.info("[FeedCommandService - viewCountUp] created new cookie - Name: {}, Value: {}", newCookie.getName(), newCookie.getValue());
         }
     }
+
+    public ResponseEntity<UpdateBlogFeedResponse> updateBlogFeed(Long feedId, String title, String description, String username){
+        log.info("[FeedCommandService - updateBlogFeed] feedId = {}, title = {}, description = {}, username ={}", feedId, title, description, username);
+
+        User user = userRepository.findByUserName(username);
+
+        Feed oldFeed = feedRepository.findById(feedId).orElseThrow(
+                () -> new NoResourceFoundException(feedId + "를 id로 갖는 feed를 찾을 수 없습니다."));
+
+        if(oldFeed.getUser() != user){
+            throw new ForbiddenAccessException("해당 feed에 대한 수정 권한이 없는 사용자입니다.");
+        }
+
+        // entity 계층에 책임 부담
+        oldFeed.updateFeed(title, description, LocalDateTime.now());
+
+
+        UpdateBlogFeedResponse updateBlogFeedResponse = UpdateBlogFeedResponse.builder()
+                .id(oldFeed.getId())
+                .title(oldFeed.getTitle())
+                .description(oldFeed.getDescription())
+                .createTime(oldFeed.getCreateTime())
+                .lastBuildTime(oldFeed.getLastBuildTime())
+                .userId(user.getId())
+                .build();
+
+        return ResponseEntity
+                .ok()
+                .body(updateBlogFeedResponse);
+
+
+    }
+
+    public ResponseEntity<DeleteBlogFeedResponse> deleteBlogFeed(Long feedId , String username){
+        log.info("[FeedCommandService - deleteBlogFeed] title = {}, username ={}", feedId, username);
+
+        User user = userRepository.findByUserName(username);
+
+        Feed oldFeed = feedRepository.findById(feedId).orElseThrow(
+                () -> new NoResourceFoundException(feedId + "를 id로 갖는 feed를 찾을 수 없습니다."));
+
+        if(oldFeed.getUser() != user){
+            throw new ForbiddenAccessException("해당 feed에 대한 삭제 권한이 없는 사용자입니다.");
+        }
+
+        feedRepository.delete(oldFeed);
+
+        DeleteBlogFeedResponse deleteBlogFeedResponse = DeleteBlogFeedResponse.builder()
+                .id(feedId)
+                .build();
+
+        return ResponseEntity
+                .ok()
+                .body(deleteBlogFeedResponse);
+
+    }
+
 }

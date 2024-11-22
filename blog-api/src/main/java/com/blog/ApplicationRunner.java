@@ -76,16 +76,16 @@ public class ApplicationRunner implements CommandLineRunner {
 
 
 
-        Feed feed1 = new Feed("title1", "desc1",LocalDateTime.now(),user1, 0);
-        Feed feed2 = new Feed("title2", "desc2",LocalDateTime.now().minusDays(1),user1,0);
-        Feed feed3 = new Feed("title3", "desc3",LocalDateTime.now().minusDays(2),user1,0);
-        Feed feed4 = new Feed("title4", "desc4",LocalDateTime.now().minusDays(3),user1,0);
-        Feed feed5 = new Feed("title5", "desc5",LocalDateTime.now().minusDays(4),user1,1);
-        Feed feed6 = new Feed("title6", "desc6",LocalDateTime.now().minusDays(5),user2,1);
-        Feed feed7 = new Feed("title7", "desc7",LocalDateTime.now().minusDays(6),user2,1);
-        Feed feed8 = new Feed("title8", "desc8",LocalDateTime.now().minusDays(7),user2,2);
-        Feed feed9 = new Feed("title9", "desc9",LocalDateTime.now().minusDays(8),user2,2);
-        Feed feed10 = new Feed("title10", "desc10",LocalDateTime.now().minusDays(9),user2,2);
+        Feed feed1 = new Feed("title1", "desc1",LocalDateTime.now(),LocalDateTime.now(), user1);
+        Feed feed2 = new Feed("title2", "desc2",LocalDateTime.now().minusDays(1),LocalDateTime.now().minusDays(1),user1);
+        Feed feed3 = new Feed("title3", "desc3",LocalDateTime.now().minusDays(2),LocalDateTime.now().minusDays(2),user1);
+        Feed feed4 = new Feed("title4", "desc4",LocalDateTime.now().minusDays(3),LocalDateTime.now().minusDays(3),user1);
+        Feed feed5 = new Feed("title5", "desc5",LocalDateTime.now().minusDays(4),LocalDateTime.now().minusDays(4),user1);
+        Feed feed6 = new Feed("title6", "desc6",LocalDateTime.now().minusDays(5),LocalDateTime.now().minusDays(5),user2);
+        Feed feed7 = new Feed("title7", "desc7",LocalDateTime.now().minusDays(6),LocalDateTime.now().minusDays(6),user2);
+        Feed feed8 = new Feed("title8", "desc8",LocalDateTime.now().minusDays(7),LocalDateTime.now().minusDays(7),user2);
+        Feed feed9 = new Feed("title9", "desc9",LocalDateTime.now().minusDays(8),LocalDateTime.now().minusDays(8),user2);
+        Feed feed10 = new Feed("title10", "desc10",LocalDateTime.now().minusDays(9),LocalDateTime.now().minusDays(9),user2);
 
         feedRepository.saveAllAndFlush(List.of(feed1, feed2, feed3, feed4, feed5, feed6, feed7, feed8, feed9, feed10));
 
