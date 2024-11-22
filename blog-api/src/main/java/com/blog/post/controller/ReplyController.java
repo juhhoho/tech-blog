@@ -20,6 +20,10 @@ public class ReplyController {
     private final ReplyApplicationService replyApplicationService;
     private final JWTUtil jwtUtil;
 
+    //------------------------------------------------------------------------------------------------------------------
+    // <POST>
+    //------------------------------------------------------------------------------------------------------------------
+
     // reply 작성
     @PostMapping("/feeds/{feed_id}/reply")
     public ResponseEntity<MakeReplyResponse> makeReply(
