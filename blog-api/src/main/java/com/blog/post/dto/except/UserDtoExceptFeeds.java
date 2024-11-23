@@ -9,7 +9,7 @@ import lombok.Getter;
 @Builder
 public class UserDtoExceptFeeds {
     private Long id;
-    private String userName;
+    private String identifier;
     private String name;
     private String email;
     private String role;

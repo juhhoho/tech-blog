@@ -33,7 +33,7 @@ public class GetOneBlogFeedResponse {
 
         UserDtoExceptFeeds user = UserDtoExceptFeeds.builder()
                 .id(feed.getUser().getId())
-                .userName(feed.getUser().getUserName())
+                .identifier(feed.getUser().getIdentifier())
                 .name(feed.getUser().getName())
                 .email(feed.getUser().getEmail())
                 .role(feed.getUser().getRole())

@@ -1,6 +1,6 @@
 package com.blog.post.entity;
 
-import com.blog.oauth2.entity.User;
+import com.blog.oauth2.entity.BaseUser;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,10 +26,10 @@ public class Reply {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user;
+    private BaseUser user;
 
     @Builder
-    public Reply(String content, Feed feed, User user) {
+    public Reply(String content, Feed feed, BaseUser user) {
         this.content = content;
         this.feed = feed;
         this.user = user;

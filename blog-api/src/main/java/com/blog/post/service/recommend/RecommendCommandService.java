@@ -2,8 +2,8 @@ package com.blog.post.service.recommend;
 
 import com.blog.exception.CustomException.NoResourceFoundException;
 import com.blog.exception.CustomException.RecommendException;
-import com.blog.oauth2.entity.User;
-import com.blog.oauth2.repository.UserRepository;
+import com.blog.oauth2.entity.BaseUser;
+import com.blog.oauth2.repository.BaseUserRepository;
 import com.blog.post.dto.response.LikeFeedResponse;
 import com.blog.post.dto.response.UnlikeFeedResponse;
 import com.blog.post.entity.Feed;
@@ -27,20 +27,20 @@ import java.util.Optional;
 @Transactional
 public class RecommendCommandService {
     private final RecommendRepository recommendRepository;
-    private final UserRepository userRepository;
+    private final BaseUserRepository baseUserRepository;
     private final FeedRepository feedRepository;
 
     @Qualifier("feedCustomRepositoryImpl")
     private final FeedCustomRepository feedCustomRepository;
 
-    public ResponseEntity<LikeFeedResponse> likeFeed(Long feedId, String username){
-        log.info("[RecommendCommandService - likeFeed] feedId = {}, username = {}", feedId, username);
+    public ResponseEntity<LikeFeedResponse> likeFeed(Long feedId, String identifier){
+        log.info("[RecommendCommandService - likeFeed] feedId = {}, identifier = {}", feedId, identifier);
         Feed feed = feedRepository.findById(feedId).orElseThrow(
                 () -> new NoResourceFoundException(feedId + "를 id 값으로 갖는 feed를 찾을 수 없습니다.")
         );
 
-        User user = Optional.of(userRepository.findByUserName(username)).orElseThrow(
-                () -> new NoResourceFoundException(username + "을 username 값으로 갖는 user를 찾을 수 없습니다.")
+        BaseUser user = Optional.of(baseUserRepository.findByIdentifier(identifier)).orElseThrow(
+                () -> new NoResourceFoundException(identifier + "을 identifier 값으로 갖는 user를 찾을 수 없습니다.")
         );
 
         // 이미 like -> error 처리
@@ -67,18 +67,19 @@ public class RecommendCommandService {
                 .body(likeFeedResponse);
     }
 
-    public ResponseEntity<UnlikeFeedResponse> unlikeFeed(Long feedId, String username){
-        log.info("[RecommendCommandService - unlikeFeed] feedId = {}, username = {}", feedId, username);
+    public ResponseEntity<UnlikeFeedResponse> unlikeFeed(Long feedId, String identifier){
+        log.info("[RecommendCommandService - unlikeFeed] feedId = {}, identifier = {}", feedId, identifier);
 
         Feed feed = feedRepository.findById(feedId).orElseThrow(
                  () -> new NoResourceFoundException(feedId + "를 id 값으로 갖는 feed를 찾을 수 없습니다.")
         );
 
-        User user = Optional.of(userRepository.findByUserName(username)).orElseThrow(
-                () -> new NoResourceFoundException(username + "을 username 값으로 갖는 user를 찾을 수 없습니다.")
+        BaseUser user = Optional.of(baseUserRepository.findByIdentifier(identifier)).orElseThrow(
+                () -> new NoResourceFoundException(identifier + "을 identifier 값으로 갖는 user를 찾을 수 없습니다.")
         );
+
         Recommend recommend = recommendRepository.findByUserAndFeed(user, feed).orElseThrow(
-                ()-> new NoResourceFoundException(username + "을 username으로 갖는 user는 " + feedId + "를 id값으로 갖는 feed에 추천을 누르지 않았습니다.")
+                ()-> new NoResourceFoundException(identifier + "을 identifier으로 갖는 user는 " + feedId + "를 id값으로 갖는 feed에 추천을 누르지 않았습니다.")
         );
 
         recommendRepository.delete(recommend);

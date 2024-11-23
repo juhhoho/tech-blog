@@ -1,7 +1,9 @@
 package com.blog;
 
-import com.blog.oauth2.entity.User;
-import com.blog.oauth2.repository.UserRepository;
+import com.blog.oauth2.entity.BaseUser;
+import com.blog.oauth2.entity.LocalUser;
+import com.blog.oauth2.repository.BaseUserRepository;
+import com.blog.oauth2.repository.LocalUserRepository;
 import com.blog.politicsnews.entity.DailyStat;
 import com.blog.politicsnews.repository.DailyStatRepository;
 import com.blog.post.entity.Feed;
@@ -22,7 +24,8 @@ public class ApplicationRunner implements CommandLineRunner {
 
     private final DailyStatRepository dailyStatRepository;
     private final FeedRepository feedRepository;
-    private final UserRepository userRepository;
+    private final BaseUserRepository baseUserRepository;
+    private final LocalUserRepository localUserRepository;
     private final RecommendRepository recommendRepository;
 
     @Override
@@ -58,22 +61,22 @@ public class ApplicationRunner implements CommandLineRunner {
         dailyStatRepository.saveAll(List.of(stat1,stat2,stat3,stat4,stat5,stat6,stat7,stat8,stat9
                 ,stat10,stat11,stat12,stat13,stat14,stat15,stat16,stat17,stat18,stat19,stat20,stat21));
 
-        User user1 = User.builder()
-                .userName("ex_username1")
+        BaseUser user1 = LocalUser.builder()
+                .identifier("id12")
+                .password("1234")
                 .name("정정정준호")
                 .email("qwer@naver.com")
                 .role("ROLE_USER")
                 .build();
-        User user2 = User.builder()
-                .userName("ex_username2")
+        BaseUser user2 = LocalUser.builder()
+                .identifier("id34")
+                .password("5678")
                 .name("김채은")
                 .email("asdf@naver.com")
                 .role("ROLE_USER")
                 .build();
 
-        userRepository.saveAllAndFlush(List.of(user1, user2));
-
-
+        baseUserRepository.saveAllAndFlush(List.of(user1, user2));
 
 
         Feed feed1 = new Feed("title1", "desc1",LocalDateTime.now(),LocalDateTime.now(), user1);

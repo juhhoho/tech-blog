@@ -1,8 +1,8 @@
 package com.blog.post.service.reply;
 
 import com.blog.exception.CustomException.NoResourceFoundException;
-import com.blog.oauth2.entity.User;
-import com.blog.oauth2.repository.UserRepository;
+import com.blog.oauth2.entity.BaseUser;
+import com.blog.oauth2.repository.BaseUserRepository;
 import com.blog.post.dto.response.MakeReplyResponse;
 import com.blog.post.entity.Feed;
 import com.blog.post.entity.Reply;
@@ -22,16 +22,16 @@ import java.util.Optional;
 public class ReplyCommandService {
     private final FeedRepository feedRepository;
     private final ReplyRepository replyRepository;
-    private final UserRepository userRepository;
+    private final BaseUserRepository baseUserRepository;
 
 
-    public ResponseEntity<MakeReplyResponse> makeReply(Long feedId, String content, String username) {
-        log.info("[ReplyCommandService - makeReply] feedId = {}, content = {}, username ={}", feedId, content, username);
+    public ResponseEntity<MakeReplyResponse> makeReply(Long feedId, String content, String identifier) {
+        log.info("[ReplyCommandService - makeReply] feedId = {}, content = {}, identifier ={}", feedId, content, identifier);
 
         Feed feed = feedRepository.findById(feedId).orElseThrow(
                 () -> new NoResourceFoundException(feedId + "를 id로 갖는 feed를 찾을 수 없습니다."));
 
-        User user = userRepository.findByUserName(username);
+        BaseUser user = baseUserRepository.findByIdentifier(identifier);
 
         Reply reply = Reply.builder()
                 .content(content)

@@ -1,9 +1,6 @@
 package com.blog.exception;
 
-import com.blog.exception.CustomException.ApiException;
-import com.blog.exception.CustomException.ForbiddenAccessException;
-import com.blog.exception.CustomException.NoResourceFoundException;
-import com.blog.exception.CustomException.RecommendException;
+import com.blog.exception.CustomException.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,8 +25,9 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ErrorResponse(ErrorType.UNKNOWN.getDescription(), ErrorType.UNKNOWN));
     }
-
-
+    // ----------------------------------------------------------------------------------------------------------------
+    // <external>
+    // ----------------------------------------------------------------------------------------------------------------
     /*
     외부 api 통신에서 발생하는 에러
     */
@@ -40,7 +38,9 @@ public class GlobalExceptionHandler {
                 .status(e.getHttpStatus())
                 .body(new ErrorResponse(e.getErrorMessage(), e.getErrorType()));
     }
-
+    // ----------------------------------------------------------------------------------------------------------------
+    // <blog-api>
+    // ----------------------------------------------------------------------------------------------------------------
     /*
     db 조회와 관련 x
     validation 제약에 의한 인자의 적정성 판단
@@ -78,11 +78,17 @@ public class GlobalExceptionHandler {
     }
 
 
-    // ----------------------------------------------------------------------------------------------------------------
-    // <recommend>
     @ExceptionHandler(RecommendException.class)
     public ResponseEntity<ErrorResponse> handleLikeDupException(RecommendException e){
         log.error("Recommend Exception occurred. message = {}, className = {}", e.getErrorMessage(), e.getClass().getName());
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(e.getErrorMessage(), ErrorType.INVALID_PARAMETER));
+    }
+
+    @ExceptionHandler(AuthInfoException.class)
+    public ResponseEntity<ErrorResponse> handleAuthInfoException(AuthInfoException e){
+        log.error("Authentication Information Exception occurred. message = {}, className = {}", e.getErrorMessage(), e.getClass().getName());
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse(e.getErrorMessage(), ErrorType.INVALID_PARAMETER));

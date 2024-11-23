@@ -2,8 +2,8 @@ package com.blog.post.service.feed;
 
 import com.blog.exception.CustomException.ForbiddenAccessException;
 import com.blog.exception.CustomException.NoResourceFoundException;
-import com.blog.oauth2.entity.User;
-import com.blog.oauth2.repository.UserRepository;
+import com.blog.oauth2.entity.BaseUser;
+import com.blog.oauth2.repository.BaseUserRepository;
 import com.blog.post.dto.response.DeleteBlogFeedResponse;
 import com.blog.post.dto.response.MakeBlogFeedResponse;
 import com.blog.post.dto.response.UpdateBlogFeedResponse;
@@ -27,12 +27,12 @@ import java.time.LocalDateTime;
 @Transactional
 public class FeedCommandService {
     private final FeedRepository feedRepository;
-    private final UserRepository userRepository;
+    private final BaseUserRepository baseUserRepository;
 
-    public ResponseEntity<MakeBlogFeedResponse> makeBlogFeed(String title, String description, String username) {
-        log.info("[FeedCommandService - makeBlogFeed] title = {}, description = {}, username ={}", title, description, username);
+    public ResponseEntity<MakeBlogFeedResponse> makeBlogFeed(String title, String description, String identifier) {
+        log.info("[FeedCommandService - makeBlogFeed] title = {}, description = {}, identifier ={}", title, description, identifier);
 
-        User user = userRepository.findByUserName(username);
+        BaseUser user = baseUserRepository.findByIdentifier(identifier);
 
         Feed newFeed = Feed.builder()
                 .title(title)
@@ -101,10 +101,10 @@ public class FeedCommandService {
         }
     }
 
-    public ResponseEntity<UpdateBlogFeedResponse> updateBlogFeed(Long feedId, String title, String description, String username){
-        log.info("[FeedCommandService - updateBlogFeed] feedId = {}, title = {}, description = {}, username ={}", feedId, title, description, username);
+    public ResponseEntity<UpdateBlogFeedResponse> updateBlogFeed(Long feedId, String title, String description, String identifier){
+        log.info("[FeedCommandService - updateBlogFeed] feedId = {}, title = {}, description = {}, identifier ={}", feedId, title, description, identifier);
 
-        User user = userRepository.findByUserName(username);
+        BaseUser user = baseUserRepository.findByIdentifier(identifier);
 
         Feed oldFeed = feedRepository.findById(feedId).orElseThrow(
                 () -> new NoResourceFoundException(feedId + "를 id로 갖는 feed를 찾을 수 없습니다."));
@@ -133,10 +133,10 @@ public class FeedCommandService {
 
     }
 
-    public ResponseEntity<DeleteBlogFeedResponse> deleteBlogFeed(Long feedId , String username){
-        log.info("[FeedCommandService - deleteBlogFeed] title = {}, username ={}", feedId, username);
+    public ResponseEntity<DeleteBlogFeedResponse> deleteBlogFeed(Long feedId , String identifier){
+        log.info("[FeedCommandService - deleteBlogFeed] title = {}, identifier ={}", feedId, identifier);
 
-        User user = userRepository.findByUserName(username);
+        BaseUser user = baseUserRepository.findByIdentifier(identifier);
 
         Feed oldFeed = feedRepository.findById(feedId).orElseThrow(
                 () -> new NoResourceFoundException(feedId + "를 id로 갖는 feed를 찾을 수 없습니다."));

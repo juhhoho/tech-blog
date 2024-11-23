@@ -4,21 +4,23 @@ import com.blog.oauth2.dto.CustomOAuth2User;
 import com.blog.oauth2.dto.UserDTO;
 import com.blog.oauth2.dto.response.NaverResponse;
 import com.blog.oauth2.dto.response.OAuth2Response;
-import com.blog.oauth2.entity.User;
-import com.blog.oauth2.repository.UserRepository;
+import com.blog.oauth2.entity.SocialUser;
+import com.blog.oauth2.repository.SocialUserRepository;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
-    private final UserRepository userRepository;
+    private final SocialUserRepository socialUserRepository;
 
-    public CustomOAuth2UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public CustomOAuth2UserService(SocialUserRepository socialUserRepository) {
+        this.socialUserRepository = socialUserRepository;
     }
 
     @Override
@@ -39,22 +41,29 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             return null;
         }
 
-        String username = oAuth2Response.getProvider()+" "+oAuth2Response.getProviderId();
-        User existUser = userRepository.findByUserName(username);
+        /*
+        특정 조건에 따라 사용자를 ROLE_ADMIN 설정
+        ex. 특정 이메일 등
+        * */
 
-        if (existUser == null) {
+        String identifier = oAuth2Response.getProvider()+" "+oAuth2Response.getProviderId();
+        Optional<SocialUser> existUser = socialUserRepository.findSocialUserByIdentifier(identifier);
 
-            User userEntity = User.builder()
-                    .userName(username)
+        // 새로운 사용자
+        if (existUser.isEmpty()) {
+
+            SocialUser userEntity = SocialUser.builder()
+                    .identifier(identifier)
                     .email(oAuth2Response.getEmail())
                     .name(oAuth2Response.getName())
                     .role("ROLE_USER")
+                    .provider(oAuth2Response.getProvider())
                     .build();
 
-            userRepository.save(userEntity);
+            socialUserRepository.save(userEntity);
 
             UserDTO userDTO = UserDTO.builder()
-                    .username(username)
+                    .username(identifier)
                     .name(oAuth2Response.getName())
                     .role("ROLE_USER")
                     .build();
@@ -62,15 +71,16 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             return new CustomOAuth2User(userDTO);
         }
         else {
-            existUser.changeEmail(oAuth2Response.getEmail());
-            existUser.changeName(oAuth2Response.getName());
+            SocialUser cuser = existUser.get();
+            cuser.changeEmail(oAuth2Response.getEmail());
+            cuser.changeName(oAuth2Response.getName());
 
-            userRepository.save(existUser);
+            socialUserRepository.save(cuser);
 
             UserDTO userDTO = UserDTO.builder()
-                    .username(existUser.getUserName())
+                    .username(cuser.getIdentifier())
                     .name(oAuth2Response.getName())
-                    .role(existUser.getRole())
+                    .role(cuser.getRole())
                     .build();
 
             return new CustomOAuth2User(userDTO);

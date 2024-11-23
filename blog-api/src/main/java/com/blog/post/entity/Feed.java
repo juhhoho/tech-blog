@@ -1,6 +1,6 @@
 package com.blog.post.entity;
 
-import com.blog.oauth2.entity.User;
+import com.blog.oauth2.entity.BaseUser;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -39,7 +39,7 @@ public class Feed {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user;
+    private BaseUser user;
 
     @ColumnDefault("0")
     @Column(name = "likeCount", nullable = false)
@@ -50,7 +50,7 @@ public class Feed {
     private int viewCount = 0;
 
     @Builder
-    public Feed(String title, String description, LocalDateTime createTime, LocalDateTime lastBuildTime, User user) {
+    public Feed(String title, String description, LocalDateTime createTime, LocalDateTime lastBuildTime, BaseUser user) {
         this.title = title;
         this.description = description;
         this.createTime = createTime;
