@@ -1,10 +1,10 @@
-package com.blog.oauth2.service;
+package com.blog.oauth2.service.user;
 
 import com.blog.exception.CustomException.AuthInfoException;
 import com.blog.oauth2.dto.request.RegisterLocalUserRequest;
 import com.blog.oauth2.dto.response.RegisterLocalUserResponse;
 import com.blog.oauth2.entity.LocalUser;
-import com.blog.oauth2.repository.LocalUserRepository;
+import com.blog.oauth2.repository.user.LocalUserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

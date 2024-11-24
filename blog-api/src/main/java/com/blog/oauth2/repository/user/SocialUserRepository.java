@@ -1,6 +1,5 @@
-package com.blog.oauth2.repository;
+package com.blog.oauth2.repository.user;
 
-import com.blog.oauth2.entity.LocalUser;
 import com.blog.oauth2.entity.SocialUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 

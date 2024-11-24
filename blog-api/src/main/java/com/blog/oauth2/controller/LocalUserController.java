@@ -4,12 +4,12 @@ import com.blog.oauth2.dto.request.LoginLocalUserRequest;
 import com.blog.oauth2.dto.request.RegisterLocalUserRequest;
 import com.blog.oauth2.dto.response.LoginLocalUserResponse;
 import com.blog.oauth2.dto.response.RegisterLocalUserResponse;
-import com.blog.oauth2.service.LocalUserApplicationService;
+import com.blog.oauth2.service.user.LocalUserApplicationService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -31,12 +31,13 @@ public class LocalUserController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginLocalUserResponse> loginLocalUser(
-            @Valid @RequestBody LoginLocalUserRequest loginLocalUserRequest
+            @Valid @RequestBody LoginLocalUserRequest loginLocalUserRequest,
+            HttpServletResponse response
     )
     {
         log.info("[LocalUserController - loginLocalUser] loginLocalUserRequest = {}", loginLocalUserRequest);
 
-        return localUserApplicationService.loginLocalUser(loginLocalUserRequest);
+        return localUserApplicationService.loginLocalUser(loginLocalUserRequest, response);
     }
 
 }

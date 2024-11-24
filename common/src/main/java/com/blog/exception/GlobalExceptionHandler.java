@@ -94,6 +94,14 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponse(e.getErrorMessage(), ErrorType.INVALID_PARAMETER));
     }
 
+    @ExceptionHandler(JwtException.class)
+    public ResponseEntity<ErrorResponse> handleJwtException(JwtException e){
+        log.error("Jwt  Exception occurred. message = {}, className = {}", e.getErrorMessage(), e.getClass().getName());
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(e.getErrorMessage(), ErrorType.INVALID_PARAMETER));
+    }
+
 
 
 

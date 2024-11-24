@@ -1,9 +1,10 @@
-package com.blog.oauth2.service;
+package com.blog.oauth2.service.user;
 
 import com.blog.oauth2.dto.request.LoginLocalUserRequest;
 import com.blog.oauth2.dto.request.RegisterLocalUserRequest;
 import com.blog.oauth2.dto.response.LoginLocalUserResponse;
 import com.blog.oauth2.dto.response.RegisterLocalUserResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class LocalUserApplicationService {
         return localUserCommandService.registerLocalUser(registerLocalUserRequest);
     }
 
-    public ResponseEntity<LoginLocalUserResponse> loginLocalUser(LoginLocalUserRequest loginLocalUserRequest) {
-        return localUserQueryService.loginLocalUser(loginLocalUserRequest);
+    public ResponseEntity<LoginLocalUserResponse> loginLocalUser(LoginLocalUserRequest loginLocalUserRequest, HttpServletResponse response) {
+        return localUserQueryService.loginLocalUser(loginLocalUserRequest, response);
     }
 }

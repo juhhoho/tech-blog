@@ -2,7 +2,7 @@ package com.blog.post.service.reply;
 
 import com.blog.exception.CustomException.NoResourceFoundException;
 import com.blog.oauth2.entity.BaseUser;
-import com.blog.oauth2.repository.BaseUserRepository;
+import com.blog.oauth2.repository.user.BaseUserRepository;
 import com.blog.post.dto.response.MakeReplyResponse;
 import com.blog.post.entity.Feed;
 import com.blog.post.entity.Reply;
@@ -13,8 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

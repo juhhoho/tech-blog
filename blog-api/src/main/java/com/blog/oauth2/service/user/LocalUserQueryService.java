@@ -1,19 +1,23 @@
-package com.blog.oauth2.service;
+package com.blog.oauth2.service.user;
 
 import com.blog.exception.CustomException.AuthInfoException;
 import com.blog.exception.CustomException.NoResourceFoundException;
 import com.blog.oauth2.dto.request.LoginLocalUserRequest;
 import com.blog.oauth2.dto.response.LoginLocalUserResponse;
 import com.blog.oauth2.entity.LocalUser;
+import com.blog.oauth2.entity.Refresh;
 import com.blog.oauth2.jwt.JWTUtil;
-import com.blog.oauth2.repository.LocalUserRepository;
-import jakarta.servlet.http.Cookie;
+import com.blog.oauth2.repository.user.LocalUserRepository;
+import com.blog.oauth2.repository.refresh.RefreshRepository;
+import com.blog.util.CookieUtils;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -23,8 +27,9 @@ public class LocalUserQueryService {
     private final LocalUserRepository localUserRepository;
     private final JWTUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
+    private final RefreshRepository refreshRepository;
 
-    public ResponseEntity<LoginLocalUserResponse> loginLocalUser(LoginLocalUserRequest loginLocalUserRequest) {
+    public ResponseEntity<LoginLocalUserResponse> loginLocalUser(LoginLocalUserRequest loginLocalUserRequest, HttpServletResponse response) {
         log.info("[LocalUserQueryService - loginLocalUser] loginLocalUserRequest = {}", loginLocalUserRequest);
 
         LocalUser localUser = localUserRepository.findLocalUserByIdentifier(loginLocalUserRequest.getIdentifier()).orElseThrow(
@@ -35,11 +40,26 @@ public class LocalUserQueryService {
             throw new AuthInfoException("입력하신 password가 일치하지 않습니다.");
         }
 
-        // 1000ms -> 1s
-        String token = jwtUtil.createJwt(localUser.getIdentifier(), localUser.getRole(), 60*60*1000L);
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + token);
+        // 토큰 생성
+        String access = jwtUtil.createJwt("access", localUser.getIdentifier(), localUser.getRole(), 600000L);
+        String refresh = jwtUtil.createJwt("refresh", localUser.getIdentifier(), localUser.getRole(), 86400000L);
 
+
+
+        // access: 헤더, refresh: 토큰
+        response.setHeader("access", access);
+        response.addCookie(CookieUtils.createCookie("refresh", refresh));
+
+        // save refresh for rotate
+        Refresh refreshRotate = Refresh.builder()
+                .username(localUser.getIdentifier())
+                .refresh(refresh)
+                .expiration(new Date(System.currentTimeMillis() + 86400000L).toString())
+                .build();
+
+        refreshRepository.save(refreshRotate);
+
+        // 응답 생성
         LoginLocalUserResponse loginLocalUserResponse = LoginLocalUserResponse.builder()
                 .localUserId(localUser.getId())
                 .localUserIdentifier(localUser.getIdentifier())
@@ -48,9 +68,6 @@ public class LocalUserQueryService {
 
         return ResponseEntity
                 .ok()
-                .headers(headers)
                 .body(loginLocalUserResponse);
-
-
     }
 }

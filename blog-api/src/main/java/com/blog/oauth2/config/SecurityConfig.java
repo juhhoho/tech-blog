@@ -3,7 +3,7 @@ package com.blog.oauth2.config;
 import com.blog.oauth2.jwt.JWTFilter;
 import com.blog.oauth2.jwt.JWTUtil;
 import com.blog.oauth2.jwt.SocialUserLoginHandler;
-import com.blog.oauth2.service.SocialUserService;
+import com.blog.oauth2.service.user.SocialUserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,7 +24,7 @@ public class SecurityConfig {
     private final SocialUserLoginHandler socialUserLoginHandler;
     private final JWTUtil jwtUtil;
 
-    public SecurityConfig(SocialUserService socialUserService, AuthenticationConfiguration authenticationConfiguration, SocialUserLoginHandler socialUserLoginHandler, JWTUtil jwtUtil) {
+    public SecurityConfig(SocialUserService socialUserService, SocialUserLoginHandler socialUserLoginHandler, JWTUtil jwtUtil) {
         this.socialUserService = socialUserService;
         this.socialUserLoginHandler = socialUserLoginHandler;
         this.jwtUtil = jwtUtil;
@@ -56,7 +56,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/h2-console/**", "/login", "/register").permitAll()
+                        .requestMatchers("/h2-console/**", "/login", "/register", "/reissue").permitAll()
                         .anyRequest().authenticated());
 
 

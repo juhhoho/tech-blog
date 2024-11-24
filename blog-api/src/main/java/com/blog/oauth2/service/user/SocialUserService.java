@@ -1,11 +1,11 @@
-package com.blog.oauth2.service;
+package com.blog.oauth2.service.user;
 
 import com.blog.oauth2.dto.SocialUserDetails;
 import com.blog.oauth2.dto.UserDTO;
 import com.blog.oauth2.dto.response.NaverResponse;
 import com.blog.oauth2.dto.response.OAuth2Response;
 import com.blog.oauth2.entity.SocialUser;
-import com.blog.oauth2.repository.SocialUserRepository;
+import com.blog.oauth2.repository.user.SocialUserRepository;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;

@@ -2,8 +2,8 @@ package com.blog;
 
 import com.blog.oauth2.entity.BaseUser;
 import com.blog.oauth2.entity.LocalUser;
-import com.blog.oauth2.repository.BaseUserRepository;
-import com.blog.oauth2.repository.LocalUserRepository;
+import com.blog.oauth2.repository.user.BaseUserRepository;
+import com.blog.oauth2.repository.user.LocalUserRepository;
 import com.blog.politicsnews.entity.DailyStat;
 import com.blog.politicsnews.repository.DailyStatRepository;
 import com.blog.post.entity.Feed;

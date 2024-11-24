@@ -1,7 +1,11 @@
 package com.blog.oauth2.jwt;
 
 import com.blog.oauth2.dto.SocialUserDetails;
+import com.blog.oauth2.entity.Refresh;
+import com.blog.oauth2.repository.refresh.RefreshRepository;
+import com.blog.util.CookieUtils;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
@@ -11,16 +15,19 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 
 @Component
 public class SocialUserLoginHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JWTUtil jwtUtil;
+    private final RefreshRepository refreshRepository;
 
-    public SocialUserLoginHandler(JWTUtil jwtUtil) {
+    public SocialUserLoginHandler(JWTUtil jwtUtil, RefreshRepository refreshRepository) {
 
         this.jwtUtil = jwtUtil;
+        this.refreshRepository = refreshRepository;
     }
 
     @Override
@@ -37,9 +44,21 @@ public class SocialUserLoginHandler extends SimpleUrlAuthenticationSuccessHandle
 
         String role = auth.getAuthority();
 
+        // 토큰 생성
+        String access = jwtUtil.createJwt("access", identifier, role, 600000L);
+        String refresh = jwtUtil.createJwt("refresh", identifier, role, 86400000L);
 
-        String token = jwtUtil.createJwt(identifier, role, 60*60*1000L);
+        // access: 헤더, refresh: 토큰
+        response.setHeader("access", access);
+        response.addCookie(CookieUtils.createCookie("refresh", refresh));
 
-        response.addHeader("Authorization", "Bearer " + token);
+        // Refresh rotate
+        Refresh refreshRotate = Refresh.builder()
+                .username(identifier)
+                .refresh(refresh)
+                .expiration(new Date(System.currentTimeMillis() + 86400000L).toString())
+                .build();
+
+        refreshRepository.save(refreshRotate);
     }
 }
