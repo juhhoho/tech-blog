@@ -37,10 +37,4 @@ public class BaseUser {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Feed> feeds = new ArrayList<>();
 
-//    public BaseUser(String identifier, String name, String email, String role) {
-//        this.identifier = identifier;
-//        this.name = name;
-//        this.email = email;
-//        this.role = role;
-//    }
 }

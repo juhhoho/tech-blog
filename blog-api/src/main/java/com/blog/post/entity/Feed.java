@@ -65,13 +65,7 @@ public class Feed {
     }
 
     //----------------------------------------------------------------------------
-    // non-static -> 인스터스화일 때 사용
-    public  void updateFeed(String title, String description, LocalDateTime lastBuildTime){
-        this.title = title;
-        this.description = description;
-        this.lastBuildTime = lastBuildTime;
-    }
-
+    // for debug
     public void setIdForTest(Long id){
         this.id = id;
     }

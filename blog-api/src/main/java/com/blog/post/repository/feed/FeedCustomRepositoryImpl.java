@@ -5,6 +5,8 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+
 
 @RequiredArgsConstructor
 @Repository
@@ -27,6 +29,17 @@ public class FeedCustomRepositoryImpl implements FeedCustomRepository {
         String jpql = "UPDATE Feed f SET f.likeCount = f.likeCount - 1 WHERE f = :feed";
         entityManager.createQuery(jpql)
                 .setParameter("feed", feed)
+                .executeUpdate();
+    }
+
+    @Override
+    public void updateFeedTitleDescriptionLastBuildTime(Feed feed , String title, String description, LocalDateTime lastBuildTime) {
+        String jpql = "UPDATE Feed f SET f.title = :title, f.description = :description, f.lastBuildTime = :lastBuildTime WHERE f = :feed";
+        entityManager.createQuery(jpql)
+                .setParameter("feed", feed)
+                .setParameter("title", title)
+                .setParameter("description", description)
+                .setParameter("lastBuildTime", lastBuildTime)
                 .executeUpdate();
     }
 

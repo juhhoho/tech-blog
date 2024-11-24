@@ -8,6 +8,8 @@ import com.blog.post.dto.response.DeleteBlogFeedResponse;
 import com.blog.post.dto.response.MakeBlogFeedResponse;
 import com.blog.post.dto.response.UpdateBlogFeedResponse;
 import com.blog.post.entity.Feed;
+import com.blog.post.repository.feed.FeedCustomRepository;
+import com.blog.post.repository.feed.FeedCustomRepositoryImpl;
 import com.blog.post.repository.feed.FeedRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,6 +30,7 @@ import java.time.LocalDateTime;
 public class FeedCommandService {
     private final FeedRepository feedRepository;
     private final BaseUserRepository baseUserRepository;
+    private final FeedCustomRepository feedCustomRepository;
 
     public ResponseEntity<MakeBlogFeedResponse> makeBlogFeed(String title, String description, String identifier) {
         log.info("[FeedCommandService - makeBlogFeed] title = {}, description = {}, identifier ={}", title, description, identifier);
@@ -113,9 +116,7 @@ public class FeedCommandService {
             throw new ForbiddenAccessException("해당 feed에 대한 수정 권한이 없는 사용자입니다.");
         }
 
-        // entity 계층에 책임 부담
-        oldFeed.updateFeed(title, description, LocalDateTime.now());
-
+        feedCustomRepository.updateFeedTitleDescriptionLastBuildTime(oldFeed, title, description, LocalDateTime.now());
 
         UpdateBlogFeedResponse updateBlogFeedResponse = UpdateBlogFeedResponse.builder()
                 .id(oldFeed.getId())
