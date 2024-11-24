@@ -1,6 +1,7 @@
 package com.blog.oauth2.jwt;
 
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,8 +22,7 @@ public class JWTUtil {
     }
 
     public String getUsername(String token) {
-
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("username", String.class);
+            return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("username", String.class);
     }
 
     public String getRole(String token) {
@@ -46,24 +46,14 @@ public class JWTUtil {
                 .compact();
     }
 
+    public String getIdentifierFromHttpRequest(HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
 
-    public String getUsernameFromCookies(HttpServletRequest request){
-        String authCookie = null;
-        if (request.getCookies() != null) {
-            for (Cookie cookie : request.getCookies()) {
-                if ("Authorization".equals(cookie.getName())) {
-                    authCookie = cookie.getValue();
-                    break;
-                }
-            }
+        if (token == null || !token.startsWith("Bearer ")) {
+            throw new RuntimeException("Missing or invalid Authorization header");
         }
-        if(authCookie == null){
-            throw new IllegalArgumentException("Authorization token is missing from cookies");
-        }
-        // Extract username from token
-        String authToken = authCookie.replace("Authorization=", "");
-        return getUsername(authToken);
 
-
+        token = token.substring(7); // "Bearer " 제거
+        return this.getUsername(token);
     }
 }

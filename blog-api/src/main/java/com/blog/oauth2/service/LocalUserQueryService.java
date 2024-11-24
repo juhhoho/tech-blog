@@ -35,22 +35,10 @@ public class LocalUserQueryService {
             throw new AuthInfoException("입력하신 password가 일치하지 않습니다.");
         }
 
-        // JWT 생성
-        // 토큰 지속시간: 10초
-        // String token = jwtUtil.createJwt(username, role, 100000L);
-        // 토큰 for local test
-        String token = jwtUtil.createJwt(localUser.getIdentifier(), localUser.getRole(), 10000000L);
-
-        // JWT를 쿠키에 추가
-        Cookie cookieAuthorization = createCookie("Authorization", token);
-
-        // 쿠키를 응답 헤더에 추가
+        // 1000ms -> 1s
+        String token = jwtUtil.createJwt(localUser.getIdentifier(), localUser.getRole(), 60*60*1000L);
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Set-Cookie", String.format("%s=%s; Path=%s; Max-Age=%d; HttpOnly",
-                cookieAuthorization.getName(),
-                cookieAuthorization.getValue(),
-                cookieAuthorization.getPath(),
-                cookieAuthorization.getMaxAge()));
+        headers.add("Authorization", "Bearer " + token);
 
         LoginLocalUserResponse loginLocalUserResponse = LoginLocalUserResponse.builder()
                 .localUserId(localUser.getId())
@@ -63,16 +51,6 @@ public class LocalUserQueryService {
                 .headers(headers)
                 .body(loginLocalUserResponse);
 
-    }
 
-    private Cookie createCookie(String key, String value) {
-
-        Cookie cookie = new Cookie(key, value);
-        cookie.setMaxAge(60*60*60);
-        //cookie.setSecure(true); //https에서만 쿠키가 전달되게 함.
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-
-        return cookie;
     }
 }

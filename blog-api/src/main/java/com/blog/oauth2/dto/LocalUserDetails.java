@@ -7,13 +7,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 @Getter
-public class CustomLocalUser implements UserDetails {
+public class LocalUserDetails implements UserDetails {
     private final UserDTO userDTO;
 
-    public CustomLocalUser(UserDTO userDTO) {
+    public LocalUserDetails(UserDTO userDTO) {
         this.userDTO = userDTO;
     }
 

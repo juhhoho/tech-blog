@@ -78,8 +78,8 @@ public class FeedController {
             @Valid @RequestBody MakeBlogFeedRequest makeBlogFeedRequest,
             HttpServletRequest request)
     {
-        log.info("[FeedController - makeBlogFeed] makeBlogFeedRequest = {}, username = {}", makeBlogFeedRequest, jwtUtil.getUsernameFromCookies(request));
-        return feedApplicationService.makeBlogFeed(makeBlogFeedRequest.getTitle(), makeBlogFeedRequest.getDescription(), jwtUtil.getUsernameFromCookies(request));
+        log.info("[FeedController - makeBlogFeed] makeBlogFeedRequest = {}, identifier = {}", makeBlogFeedRequest, jwtUtil.getIdentifierFromHttpRequest(request));
+        return feedApplicationService.makeBlogFeed(makeBlogFeedRequest.getTitle(), makeBlogFeedRequest.getDescription(), jwtUtil.getIdentifierFromHttpRequest(request));
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -93,8 +93,8 @@ public class FeedController {
             @Valid @RequestBody UpdateBlogFeedRequest updateBlogFeedRequest,
             HttpServletRequest request)
     {
-        log.info("[FeedController - updateBlogFeed] feedId = {} updateBlogFeedRequest = {}, username = {}", feedId, updateBlogFeedRequest, jwtUtil.getUsernameFromCookies(request));
-        return feedApplicationService.updateBlogFeed(feedId, updateBlogFeedRequest.getTitle(), updateBlogFeedRequest.getDescription(), jwtUtil.getUsernameFromCookies(request));
+        log.info("[FeedController - updateBlogFeed] feedId = {} updateBlogFeedRequest = {}, identifier = {}", feedId, updateBlogFeedRequest, jwtUtil.getIdentifierFromHttpRequest(request));
+        return feedApplicationService.updateBlogFeed(feedId, updateBlogFeedRequest.getTitle(), updateBlogFeedRequest.getDescription(), jwtUtil.getIdentifierFromHttpRequest(request));
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -107,8 +107,8 @@ public class FeedController {
             @PathVariable("feed_id") Long feedId,
             HttpServletRequest request)
     {
-        log.info("[FeedController - deleteBlogFeed] feedId = {}, username = {}", feedId, jwtUtil.getUsernameFromCookies(request));
-        return feedApplicationService.deleteBlogFeed(feedId, jwtUtil.getUsernameFromCookies(request));
+        log.info("[FeedController - deleteBlogFeed] feedId = {}, identifier = {}", feedId, jwtUtil.getIdentifierFromHttpRequest(request));
+        return feedApplicationService.deleteBlogFeed(feedId, jwtUtil.getIdentifierFromHttpRequest(request));
     }
 
 

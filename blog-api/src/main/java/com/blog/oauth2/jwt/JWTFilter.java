@@ -1,11 +1,10 @@
 package com.blog.oauth2.jwt;
 
-import com.blog.oauth2.dto.CustomLocalUser;
-import com.blog.oauth2.dto.CustomOAuth2User;
+import com.blog.oauth2.dto.LocalUserDetails;
+import com.blog.oauth2.dto.SocialUserDetails;
 import com.blog.oauth2.dto.UserDTO;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -28,26 +27,13 @@ public class JWTFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-      log.info("[JWTFilter - doFilterInternal]");
-        String uri = request.getRequestURI();
+        log.info("[JWTFilter - doFilterInternal]");
 
-        // /luser/** , /h2-console 경로는 필터를 거치지 않도록 설정
-        if (uri.startsWith("/luser/login") || uri.startsWith("/luser/register") || uri.startsWith("/h2-console")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        //cookie들을 불러온 뒤 Authorization Key에 담긴 쿠키를 찾음
-        String authorization = null;
-        Cookie[] cookies = request.getCookies();
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("Authorization")) {
-                authorization = cookie.getValue();
-            }
-        }
-
+        //request에서 Authorization 헤더를 찾음
+        String authorization= request.getHeader("Authorization");
+        
         //Authorization 헤더 검증
-        if (authorization == null) {
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
 
             System.out.println("token null");
             filterChain.doFilter(request, response);
@@ -56,8 +42,8 @@ public class JWTFilter extends OncePerRequestFilter {
             return;
         }
 
-        //토큰
-        String token = authorization;
+        String token = authorization.split(" ")[1];
+
         //토큰 소멸 시간 검증
         if (jwtUtil.isExpired(token)) {
 
@@ -67,6 +53,7 @@ public class JWTFilter extends OncePerRequestFilter {
             //조건이 해당되면 메소드 종료 (필수)
             return;
         }
+
         //토큰에서 username과 role 획득
         String username = jwtUtil.getUsername(token);
         String role = jwtUtil.getRole(token);
@@ -77,30 +64,30 @@ public class JWTFilter extends OncePerRequestFilter {
                 .role(role)
                 .build();
 
-        // social user
+        // social user - naver
         if (username.startsWith("naver")){
             //UserDetails에 회원 정보 객체 담기
-            CustomOAuth2User customOAuth2User = new CustomOAuth2User(userDTO);
+            SocialUserDetails socialUserDetails = new SocialUserDetails(userDTO);
 
             //스프링 시큐리티 인증 토큰 생성
-            Authentication authToken = new UsernamePasswordAuthenticationToken(customOAuth2User, null, customOAuth2User.getAuthorities());
+            Authentication authToken = new UsernamePasswordAuthenticationToken(socialUserDetails, null, socialUserDetails.getAuthorities());
             //세션에 사용자 등록
             SecurityContextHolder.getContext().setAuthentication(authToken);
-
+            System.out.println("1" );
             filterChain.doFilter(request, response);
         }
         // local user
         else {
             // UserDetails에 회원 정보 객체 담기
-            CustomLocalUser customLocalUser = new CustomLocalUser(userDTO);
+            LocalUserDetails localUserDetails = new LocalUserDetails(userDTO);
 
             // 스프링 시큐리티 인증 토큰 생성
             Authentication authToken = new UsernamePasswordAuthenticationToken(
-                    customLocalUser, null, customLocalUser.getAuthorities());
+                    localUserDetails, null, localUserDetails.getAuthorities());
 
             // 세션에 사용자 등록
             SecurityContextHolder.getContext().setAuthentication(authToken);
-
+            System.out.println("2" );
             // 다음 필터로 요청 전달
             filterChain.doFilter(request, response);
         }
@@ -108,3 +95,4 @@ public class JWTFilter extends OncePerRequestFilter {
 
     }
 }
+

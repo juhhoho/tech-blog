@@ -19,7 +19,7 @@ public class LocalUserController {
 
     private final LocalUserApplicationService localUserApplicationService;
 
-    @PostMapping("/luser/register")
+    @PostMapping("/register")
     public ResponseEntity<RegisterLocalUserResponse> registerLocalUser(
             @Valid @RequestBody RegisterLocalUserRequest registerLocalUserRequest
     )
@@ -29,7 +29,7 @@ public class LocalUserController {
         return localUserApplicationService.registerLocalUser(registerLocalUserRequest);
     }
 
-    @PostMapping("/luser/login")
+    @PostMapping("/login")
     public ResponseEntity<LoginLocalUserResponse> loginLocalUser(
             @Valid @RequestBody LoginLocalUserRequest loginLocalUserRequest
     )

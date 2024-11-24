@@ -1,6 +1,6 @@
 package com.blog.oauth2.service;
 
-import com.blog.oauth2.dto.CustomOAuth2User;
+import com.blog.oauth2.dto.SocialUserDetails;
 import com.blog.oauth2.dto.UserDTO;
 import com.blog.oauth2.dto.response.NaverResponse;
 import com.blog.oauth2.dto.response.OAuth2Response;
@@ -15,11 +15,11 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-public class CustomOAuth2UserService extends DefaultOAuth2UserService {
+public class SocialUserService extends DefaultOAuth2UserService {
 
     private final SocialUserRepository socialUserRepository;
 
-    public CustomOAuth2UserService(SocialUserRepository socialUserRepository) {
+    public SocialUserService(SocialUserRepository socialUserRepository) {
         this.socialUserRepository = socialUserRepository;
     }
 
@@ -68,7 +68,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     .role("ROLE_USER")
                     .build();
 
-            return new CustomOAuth2User(userDTO);
+            return new SocialUserDetails(userDTO);
         }
         else {
             SocialUser cuser = existUser.get();
@@ -83,7 +83,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     .role(cuser.getRole())
                     .build();
 
-            return new CustomOAuth2User(userDTO);
+            return new SocialUserDetails(userDTO);
         }
     }
 }

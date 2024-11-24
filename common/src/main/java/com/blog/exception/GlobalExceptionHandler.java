@@ -18,13 +18,13 @@ public class GlobalExceptionHandler {
     /*
     모든 에러를 전부 예상하고 처리할 수 없기 때문에 일단은 서버 내부적인 에러로 처리
     */
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleException(Exception e){
-        log.error("Exception occurred. message = {}, className = {}", e.getMessage(), e.getClass().getName());
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ErrorResponse(ErrorType.UNKNOWN.getDescription(), ErrorType.UNKNOWN));
-    }
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<ErrorResponse> handleException(Exception e){
+//        log.error("Exception occurred. message = {}, className = {}", e.getMessage(), e.getClass().getName());
+//        return ResponseEntity
+//                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                .body(new ErrorResponse(ErrorType.UNKNOWN.getDescription(), ErrorType.UNKNOWN));
+//    }
     // ----------------------------------------------------------------------------------------------------------------
     // <external>
     // ----------------------------------------------------------------------------------------------------------------
@@ -90,7 +90,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleAuthInfoException(AuthInfoException e){
         log.error("Authentication Information Exception occurred. message = {}, className = {}", e.getErrorMessage(), e.getClass().getName());
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
+                .status(HttpStatus.UNAUTHORIZED)
                 .body(new ErrorResponse(e.getErrorMessage(), ErrorType.INVALID_PARAMETER));
     }
 

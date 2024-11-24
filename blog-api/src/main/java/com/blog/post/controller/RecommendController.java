@@ -29,8 +29,8 @@ public class RecommendController {
             @PathVariable("feed_id") Long feedId,
             HttpServletRequest request)
     {
-        log.info("[RecommendController - likeFeed] feedId = {}, username = {}", feedId, jwtUtil.getUsernameFromCookies(request));
-        return recommendApplicationService.likeFeed(feedId, jwtUtil.getUsernameFromCookies(request), LocalDateTime.now());
+        log.info("[RecommendController - likeFeed] feedId = {}, identifier = {}", feedId, jwtUtil.getIdentifierFromHttpRequest(request));
+        return recommendApplicationService.likeFeed(feedId, jwtUtil.getIdentifierFromHttpRequest(request), LocalDateTime.now());
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -42,7 +42,7 @@ public class RecommendController {
             @PathVariable("feed_id") Long feedId,
             HttpServletRequest request)
     {
-        log.info("[RecommendController - unlikeFeed] feedId = {}, username = {}", feedId, jwtUtil.getUsernameFromCookies(request));
-        return recommendApplicationService.unlikeFeed(feedId, jwtUtil.getUsernameFromCookies(request));
+        log.info("[RecommendController - unlikeFeed] feedId = {}, identifier = {}", feedId, jwtUtil.getIdentifierFromHttpRequest(request));
+        return recommendApplicationService.unlikeFeed(feedId, jwtUtil.getIdentifierFromHttpRequest(request));
     }
 }

@@ -31,7 +31,7 @@ public class ReplyController {
             @Valid @RequestBody MakeReplyRequest makeReplyRequest,
             HttpServletRequest request)
     {
-        log.info("[ReplyController - makeReply] feed_id = {}, feedReplyRequest = {}, username = {}", feedId, makeReplyRequest, jwtUtil.getUsernameFromCookies(request));
-        return replyApplicationService.makeReply(feedId, makeReplyRequest.getContent(), jwtUtil.getUsernameFromCookies(request));
+        log.info("[ReplyController - makeReply] feed_id = {}, feedReplyRequest = {}, identifier = {}", feedId, makeReplyRequest, jwtUtil.getIdentifierFromHttpRequest(request));
+        return replyApplicationService.makeReply(feedId, makeReplyRequest.getContent(), jwtUtil.getIdentifierFromHttpRequest(request));
     }
 }
