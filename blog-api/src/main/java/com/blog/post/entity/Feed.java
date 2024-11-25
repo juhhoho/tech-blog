@@ -1,6 +1,6 @@
 package com.blog.post.entity;
 
-import com.blog.oauth2.entity.BaseUser;
+import com.blog.auth.entity.BaseUser;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -43,7 +43,11 @@ public class Feed {
 
     @ColumnDefault("0")
     @Column(name = "likeCount", nullable = false)
-    private int likeCount;
+    private int likeCount = 0;
+
+    @ColumnDefault("0")
+    @Column(name = "dislikeCount", nullable = false)
+    private int dislikeCount = 0;
 
     @ColumnDefault("0")
     @Column(name = "viewCount", nullable = false)
@@ -56,12 +60,6 @@ public class Feed {
         this.createTime = createTime;
         this.lastBuildTime = lastBuildTime;
         this.user = user;
-    }
-
-    //----------------------------------------------------------------------------
-    // static -> 인스터스화 x 일 때 사용
-    public static void viewCountUp(Feed feed) {
-        feed.viewCount++;
     }
 
     //----------------------------------------------------------------------------

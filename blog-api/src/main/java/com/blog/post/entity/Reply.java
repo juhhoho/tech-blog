@@ -1,6 +1,6 @@
 package com.blog.post.entity;
 
-import com.blog.oauth2.entity.BaseUser;
+import com.blog.auth.entity.BaseUser;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;

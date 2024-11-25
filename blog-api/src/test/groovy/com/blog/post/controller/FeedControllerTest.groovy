@@ -1,14 +1,12 @@
 package com.blog.post.controller
 
-import com.blog.oauth2.jwt.JWTUtil
+import com.blog.auth.jwt.JWTUtil
 import com.blog.post.dto.except.ReplyDtoExceptFeedAndUser
 import com.blog.post.dto.except.UserDtoExceptFeeds
 import com.blog.post.dto.request.MakeBlogFeedRequest
 import com.blog.post.dto.response.GetOneBlogFeedResponse
 import com.blog.post.dto.response.MakeBlogFeedResponse
-import com.blog.post.dto.response.MakeReplyResponse
 import com.blog.post.service.feed.FeedApplicationService
-import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType

@@ -24,6 +24,14 @@ public class StatApplicationService {
         return statQueryService.getMostDailyLikedBlogFeeds(page, size, count, today);
     }
 
+    public PageResult<GetBlogFeedsResponse> getMostDislikedBlogFeeds(int page, int size, int count){
+        return statQueryService.getMostDislikedBlogFeeds(page, size, count);
+    }
+
+    public PageResult<GetBlogFeedsResponse> getMostDailyDislikedBlogFeeds(int page, int size, int count, LocalDate today){
+        return statQueryService.getMostDailyDislikedBlogFeeds(page, size, count, today);
+    }
+
     public PageResult<GetBlogFeedsResponse> getMostViewedBlogFeeds(int page, int size, int count){
         return statQueryService.getMostViewedBlogFeeds(page, size, count);
 

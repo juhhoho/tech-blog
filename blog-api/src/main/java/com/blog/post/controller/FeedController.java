@@ -1,6 +1,6 @@
 package com.blog.post.controller;
 
-import com.blog.oauth2.jwt.JWTUtil;
+import com.blog.auth.jwt.JWTUtil;
 import com.blog.pagination.PageResult;
 import com.blog.post.dto.request.MakeBlogFeedRequest;
 import com.blog.post.dto.request.UpdateBlogFeedRequest;

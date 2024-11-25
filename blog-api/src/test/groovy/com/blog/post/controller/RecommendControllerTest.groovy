@@ -1,11 +1,8 @@
 package com.blog.post.controller
 
-import com.blog.oauth2.jwt.JWTUtil
+import com.blog.auth.jwt.JWTUtil
 import com.blog.post.dto.response.LikeFeedResponse
-import com.blog.post.dto.response.MakeReplyResponse
-import com.blog.post.dto.response.UnlikeFeedResponse
 import com.blog.post.service.recommend.RecommendApplicationService
-import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity

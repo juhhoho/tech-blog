@@ -1,0 +1,12 @@
+package com.blog.auth.repository.user;
+
+import com.blog.auth.entity.SocialUser;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+public interface SocialUserRepository extends JpaRepository<SocialUser, Long> {
+
+    boolean existsByIdentifier(String identifier);
+
+    Optional<SocialUser> findSocialUserByIdentifier(String identifier);
+}

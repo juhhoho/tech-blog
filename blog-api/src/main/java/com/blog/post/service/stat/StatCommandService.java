@@ -2,9 +2,11 @@ package com.blog.post.service.stat;
 
 import com.blog.exception.CustomException.NoResourceFoundException;
 import com.blog.post.entity.Feed;
+import com.blog.post.entity.StatDailyDislike;
 import com.blog.post.entity.StatDailyLike;
 import com.blog.post.repository.feed.FeedRepository;
-import com.blog.post.repository.stat.StatRepository;
+import com.blog.post.repository.stat.StatDailyDislikeRepository;
+import com.blog.post.repository.stat.StatDailyLikeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,7 +19,8 @@ import java.time.LocalDateTime;
 @Service
 @Transactional
 public class StatCommandService {
-    private final StatRepository statRepository;
+    private final StatDailyLikeRepository statDailyLikeRepository;
+    private final StatDailyDislikeRepository statDailyDislikeRepository;
     private final FeedRepository feedRepository;
 
     public void saveLikeTime(Long feedId, LocalDateTime likeDateTime){
@@ -31,6 +34,20 @@ public class StatCommandService {
                 .likeDateTime(likeDateTime)
                 .build();
 
-        statRepository.save(statDailyLike);
+        statDailyLikeRepository.save(statDailyLike);
+    }
+
+    public void saveDislikeTime(Long feedId, LocalDateTime dislikeDateTime){
+        log.info("[StatCommandService] saveDislikeTime - feedId: {}, dislikeDateTime: {}", feedId, dislikeDateTime);
+
+        Feed feed = feedRepository.findById(feedId).orElseThrow(
+                () -> new NoResourceFoundException(feedId + "를 id로 갖는 feed를 찾을 수 없습니다."));
+
+        StatDailyDislike statDailyDislike = StatDailyDislike.builder()
+                .feed(feed)
+                .dislikeDateTime(dislikeDateTime)
+                .build();
+
+        statDailyDislikeRepository.save(statDailyDislike);
     }
 }

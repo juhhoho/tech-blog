@@ -2,8 +2,8 @@ package com.blog.post.service.feed;
 
 import com.blog.exception.CustomException.ForbiddenAccessException;
 import com.blog.exception.CustomException.NoResourceFoundException;
-import com.blog.oauth2.entity.BaseUser;
-import com.blog.oauth2.repository.user.BaseUserRepository;
+import com.blog.auth.entity.BaseUser;
+import com.blog.auth.repository.user.BaseUserRepository;
 import com.blog.post.dto.response.DeleteBlogFeedResponse;
 import com.blog.post.dto.response.MakeBlogFeedResponse;
 import com.blog.post.dto.response.UpdateBlogFeedResponse;
@@ -80,7 +80,8 @@ public class FeedCommandService {
                 Feed feed = feedRepository.findById(feedId).orElseThrow(
                         ()-> new NoResourceFoundException(feedId + "를 id로 갖는 feed를 찾을 수 없습니다."));
 
-                Feed.viewCountUp(feed);
+                feedCustomRepository.addViewCount(feed);
+
                 oldCookie.setValue(oldCookie.getValue() + "_[" + feedId + "]");
                 oldCookie.setPath("/");
                 oldCookie.setMaxAge(60 * 60 * 24);
@@ -93,7 +94,8 @@ public class FeedCommandService {
             Feed feed = feedRepository.findById(feedId).orElseThrow(
                     ()-> new NoResourceFoundException(feedId + "를 id로 갖는 feed를 찾을 수 없습니다."));
 
-            Feed.viewCountUp(feed);
+            feedCustomRepository.addViewCount(feed);
+
             Cookie newCookie = new Cookie("feedView","[" + feedId + "]");
             newCookie.setPath("/");
             newCookie.setMaxAge(60 * 60 * 24);

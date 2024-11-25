@@ -1,6 +1,6 @@
 package com.blog.post.entity;
 
-import com.blog.oauth2.entity.BaseUser;
+import com.blog.auth.entity.BaseUser;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,6 +17,9 @@ public class Recommend {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "type")
+    private String type;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private BaseUser user;
@@ -26,8 +29,9 @@ public class Recommend {
     private Feed feed;
 
     @Builder
-    public Recommend(BaseUser user, Feed feed) {
+    public Recommend(BaseUser user, Feed feed, String type) {
         this.user = user;
         this.feed = feed;
+        this.type = type;
     }
 }

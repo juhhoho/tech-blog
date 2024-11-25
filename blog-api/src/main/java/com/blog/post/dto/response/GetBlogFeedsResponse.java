@@ -15,6 +15,7 @@ public class GetBlogFeedsResponse {
     private String description;
     private LocalDateTime lastBuildTime;
     private int likeCount;
+    private int dislikeCount;
     private int viewCount;
     private UserDtoExceptFeeds user;
 
@@ -28,6 +29,6 @@ public class GetBlogFeedsResponse {
                 .role(feed.getUser().getRole())
                 .build();
 
-        return new GetBlogFeedsResponse(feed.getId(), feed.getTitle(), feed.getDescription(), feed.getLastBuildTime(), feed.getLikeCount(), feed.getViewCount(), user);
+        return new GetBlogFeedsResponse(feed.getId(), feed.getTitle(), feed.getDescription(), feed.getLastBuildTime(), feed.getLikeCount(), feed.getDislikeCount(), feed.getViewCount(), user);
     }
 }

@@ -20,6 +20,7 @@ public class GetOneBlogFeedResponse {
     private LocalDateTime lastBuildTime;
     private UserDtoExceptFeeds user;
     private int likeCount;
+    private int dislikeCount;
     private int viewCount;
     private List<ReplyDtoExceptFeedAndUser> replies;
 
@@ -39,6 +40,6 @@ public class GetOneBlogFeedResponse {
                 .role(feed.getUser().getRole())
                 .build();
 
-        return new GetOneBlogFeedResponse(feed.getId(), feed.getTitle(), feed.getDescription(), feed.getLastBuildTime(), user,feed.getLikeCount(), feed.getViewCount(),replies);
+        return new GetOneBlogFeedResponse(feed.getId(), feed.getTitle(), feed.getDescription(), feed.getLastBuildTime(), user,feed.getLikeCount(), feed.getDislikeCount(), feed.getViewCount(),replies);
     }
 }

@@ -4,12 +4,14 @@ import com.blog.post.entity.Feed;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
 
 @RequiredArgsConstructor
 @Repository
+@Transactional
 public class FeedCustomRepositoryImpl implements FeedCustomRepository {
 
     // em을 사용하면 영속성 컨텍스트 무시하고 바로 db에 반영
@@ -25,8 +27,33 @@ public class FeedCustomRepositoryImpl implements FeedCustomRepository {
     }
 
     @Override
+    public void addDislikeCount(Feed feed) {
+        String jpql = "UPDATE Feed f SET f.dislikeCount = f.dislikeCount + 1 WHERE f = :feed";
+        entityManager.createQuery(jpql)
+                .setParameter("feed", feed)
+                .executeUpdate();
+
+    }
+
+    @Override
     public void subLikeCount(Feed feed) {
         String jpql = "UPDATE Feed f SET f.likeCount = f.likeCount - 1 WHERE f = :feed";
+        entityManager.createQuery(jpql)
+                .setParameter("feed", feed)
+                .executeUpdate();
+    }
+
+    @Override
+    public void subDislikeCount(Feed feed) {
+        String jpql = "UPDATE Feed f SET f.dislikeCount = f.dislikeCount - 1 WHERE f = :feed";
+        entityManager.createQuery(jpql)
+                .setParameter("feed", feed)
+                .executeUpdate();
+    }
+
+    @Override
+    public void addViewCount(Feed feed) {
+        String jpql = "UPDATE Feed f SET f.viewCount = f.viewCount + 1 WHERE f = :feed";
         entityManager.createQuery(jpql)
                 .setParameter("feed", feed)
                 .executeUpdate();
@@ -42,5 +69,6 @@ public class FeedCustomRepositoryImpl implements FeedCustomRepository {
                 .setParameter("lastBuildTime", lastBuildTime)
                 .executeUpdate();
     }
+
 
 }

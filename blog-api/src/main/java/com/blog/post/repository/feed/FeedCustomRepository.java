@@ -8,7 +8,13 @@ import java.time.LocalDateTime;
 public interface FeedCustomRepository {
     void addLikeCount(Feed feed);
 
+    void addDislikeCount(Feed feed);
+
     void subLikeCount(Feed feed);
+
+    void subDislikeCount(Feed feed);
+
+    void addViewCount(Feed feed);
 
     void updateFeedTitleDescriptionLastBuildTime(Feed feed, String title, String description, LocalDateTime lasBuildTime);
 }

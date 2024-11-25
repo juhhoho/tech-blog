@@ -52,6 +52,32 @@ public class StatController {
     }
 
 
+    // 누적 비추천 수 기반 상위 n개 feeds stat
+    // 페이징(page = 1, size = 5)
+    @GetMapping("/stat/feeds/dislike")
+    public PageResult<GetBlogFeedsResponse> getMostDislikedBlogFeeds(
+            @RequestParam(defaultValue = "1") @Min(1) @Max(10000) int page,
+            @RequestParam(defaultValue = "5") @Min(1) @Max(50) int size,
+            @RequestParam(defaultValue = "5") @Min(1) @Max(10) int count)
+    {
+        log.info("[FeedController - getMostDislikedBlogFeeds] page = {}, size = {}, count = {}", page, size, count);
+        return statApplicationService.getMostDislikedBlogFeeds(page, size, count);
+    }
+
+    // 일간 비추천 수 기반 상위 n개 feeds stat
+    // 페이징(page = 1, size = 5)
+    @GetMapping("/stat/feeds/dislike/daily")
+    public PageResult<GetBlogFeedsResponse> getMostDailyDislikedBlogFeeds(
+            @RequestParam(defaultValue = "1") @Min(1) @Max(10000) int page,
+            @RequestParam(defaultValue = "5") @Min(1) @Max(50) int size,
+            @RequestParam(defaultValue = "5") @Min(1) @Max(10) int count,
+            @RequestParam LocalDate date)
+    {
+        log.info("[FeedController - getMostDailyDislikedBlogFeeds] page = {}, size = {}, count = {}, today = {}", page, size, count, date);
+        return statApplicationService.getMostDailyDislikedBlogFeeds(page, size, count, date);
+    }
+
+
     // 누적 조회 수 기반 상위 n개 feeds stat
     // 페이징(page = 1, size = 5)
     // 동일 사용자의 24시간 이내 중복 조회는 무시 처리

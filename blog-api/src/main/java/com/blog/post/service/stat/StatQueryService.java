@@ -28,11 +28,29 @@ public class StatQueryService {
         return PaginateUtils.paginate(blogFeeds, page, size, GetBlogFeedsResponse::convertToGetBlogFeedsResponse);
     }
 
-    // 추천수 기반 feeds 페이징 결과 반환
+    // 일간 추천수 기반 feeds 페이징 결과 반환
     public PageResult<GetBlogFeedsResponse> getMostDailyLikedBlogFeeds(int page, int size, int count, LocalDate date){
         log.info("[StatQueryService - getMostDailyLikedBlogFeeds] page = {}, size = {}, count = {}, today = {}", page, size, count, date);
 
         List<Feed> blogFeeds = statCustomRepository.getNFeedsByMostDailyLiked(count, date);
+
+        return PaginateUtils.paginate(blogFeeds, page, size, GetBlogFeedsResponse::convertToGetBlogFeedsResponse);
+    }
+
+    // 누적 비추천수 기반 feeds 페이징 결과 반환
+    public PageResult<GetBlogFeedsResponse> getMostDislikedBlogFeeds(int page, int size, int count){
+        log.info("[StatQueryService - getMostDislikedBlogFeeds] page = {}, size = {}, count = {}", page, size, count);
+
+        List<Feed> blogFeeds = statCustomRepository.getNFeedsByMostDisliked(count);
+
+        return PaginateUtils.paginate(blogFeeds, page, size, GetBlogFeedsResponse::convertToGetBlogFeedsResponse);
+    }
+
+    // 일간 비추천수 기반 feeds 페이징 결과 반환
+    public PageResult<GetBlogFeedsResponse> getMostDailyDislikedBlogFeeds(int page, int size, int count, LocalDate date){
+        log.info("[StatQueryService - getMostDailyDislikedBlogFeeds] page = {}, size = {}, count = {}, today = {}", page, size, count, date);
+
+        List<Feed> blogFeeds = statCustomRepository.getNFeedsByMostDailyDisliked(count, date);
 
         return PaginateUtils.paginate(blogFeeds, page, size, GetBlogFeedsResponse::convertToGetBlogFeedsResponse);
     }

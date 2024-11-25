@@ -9,8 +9,14 @@ public interface StatCustomRepository {
 
     List<Feed> getNFeedsByMostLiked(int count);
 
-    // 특정 date애 대해 그날의 추천수에 따른 n개의 feed를 반환
+    // 특정 date에 대해 그날의 추천수에 따른 n개의 feed list 반환
     List<Feed> getNFeedsByMostDailyLiked(int count, LocalDate date);
+
+    List<Feed> getNFeedsByMostDisliked(int count);
+
+    // 특정 date에 대해 그날의 추천수에 따른 n개의 feed list 반환
+    List<Feed> getNFeedsByMostDailyDisliked(int count, LocalDate date);
+
 
     List<Feed> getNFeedsByMostViewed(int count);
 
