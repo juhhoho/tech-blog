@@ -42,7 +42,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
         //path and method verify
         String requestUri = request.getRequestURI();
         if (!requestUri.matches("^\\/logout$")) {
-
+            System.out.println("requestUri [" + requestUri + "] is not logout");
             filterChain.doFilter(request, response);
             return;
         }
@@ -52,6 +52,8 @@ public class CustomLogoutFilter extends GenericFilterBean {
             filterChain.doFilter(request, response);
             return;
         }
+
+        System.out.println("asdasdasdasd");
 
         //get refresh token
         String refreshToken = null;

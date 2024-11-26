@@ -68,6 +68,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/h2-console/**", "/login", "/register", "/reissue").permitAll()
+                        // WebSocket 경로를 무시하도록 설정
+                        .requestMatchers("/chats").permitAll()
                         .anyRequest().authenticated());
 
 
@@ -76,6 +78,7 @@ public class SecurityConfig {
 
 
         // OAuth2 소셜 로그인 설정
+
         http.oauth2Login(oauth2 -> oauth2
                 .userInfoEndpoint(userInfo -> userInfo.userService(socialUserService))
                 .successHandler(socialUserLoginHandler)); // 소셜 로그인 성공 시 socialUserLoginHandler 호출
