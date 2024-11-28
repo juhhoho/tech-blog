@@ -3,7 +3,7 @@ package com.blog.post.service.recommend;
 import com.blog.exception.CustomException.NoResourceFoundException;
 import com.blog.exception.CustomException.RecommendException;
 import com.blog.auth.entity.BaseUser;
-import com.blog.auth.repository.user.BaseUserRepository;
+import com.blog.auth.repository.BaseUserRepository;
 import com.blog.post.dto.response.DislikeFeedResponse;
 import com.blog.post.dto.response.LikeFeedResponse;
 import com.blog.post.dto.response.UnDislikeFeedResponse;

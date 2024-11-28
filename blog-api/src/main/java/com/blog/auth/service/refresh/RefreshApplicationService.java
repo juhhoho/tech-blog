@@ -8,13 +8,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class RefreshApplicationService {
     private final RefreshCommandService refreshCommandService;
 
-    public ResponseEntity<ReissueResponse> reissue(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<ReissueResponse> reissue(HttpServletRequest request, HttpServletResponse response) throws IOException {
         return refreshCommandService.reissue(request, response);
     }
 }

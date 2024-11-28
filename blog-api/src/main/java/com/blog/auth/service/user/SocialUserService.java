@@ -5,7 +5,7 @@ import com.blog.auth.dto.UserDTO;
 import com.blog.auth.dto.response.NaverResponse;
 import com.blog.auth.dto.response.OAuth2Response;
 import com.blog.auth.entity.SocialUser;
-import com.blog.auth.repository.user.SocialUserRepository;
+import com.blog.auth.repository.SocialUserRepository;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;

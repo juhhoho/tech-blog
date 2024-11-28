@@ -1,4 +1,4 @@
-package com.blog.auth.repository.user;
+package com.blog.auth.repository;
 
 import com.blog.auth.entity.LocalUser;
 import org.springframework.data.jpa.repository.JpaRepository;

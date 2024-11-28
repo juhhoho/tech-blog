@@ -5,6 +5,7 @@ import com.blog.chat.dto.ChatDto;
 import com.blog.chat.dto.WebSocketMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
@@ -12,20 +13,28 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import java.time.LocalDateTime;
+
 @Component
 @Log4j2
 @RequiredArgsConstructor
 public class WebSocketChatHandler extends TextWebSocketHandler {
     private final ChatRoom chatRoom;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
 
+
+
+    // beforeHandshake 에서 마지막에 id 값 넣어줌
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws JsonProcessingException {
-        String identifier = (String) session.getAttributes().get("identifier");
-        WebSocketMessage webSocketMessage = (WebSocketMessage) objectMapper.readValue(message.getPayload(), WebSocketMessage.class);
+        WebSocketMessage webSocketMessage = objectMapper.registerModule(new JavaTimeModule()).readValue(message.getPayload(), WebSocketMessage.class);
+
+        // 메세지 처리 시간 설정
+        webSocketMessage.getPayload().setChatDateTime(LocalDateTime.now());
+
         switch (webSocketMessage.getType().getValue()) {
             case "ENTER" -> enterChatRoom(webSocketMessage.getPayload(), session);
-            case "TALK" -> sendMessage(identifier, webSocketMessage.getPayload());
+            case "TALK" -> sendMessage(webSocketMessage.getPayload(), session);
             case "EXIT" -> exitChatRoom(webSocketMessage.getPayload(), session);
         }
     }
@@ -34,11 +43,10 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
      * 메시지 전송
      * @param chatDto ChatDto
      */
-    private void sendMessage(String identifier, ChatDto chatDto) {
+    private void sendMessage(ChatDto chatDto, WebSocketSession session) {
         log.info("send chatDto : " + chatDto.toString());
-
         // redis로 메세지 pub
-        chatRoom.sendMessage(chatDto);
+        chatRoom.sendMessage(chatDto, session);
     }
 
     /**

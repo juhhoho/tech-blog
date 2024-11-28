@@ -3,7 +3,7 @@ package com.blog.post.service.reply;
 import com.blog.exception.CustomException.ForbiddenAccessException;
 import com.blog.exception.CustomException.NoResourceFoundException;
 import com.blog.auth.entity.BaseUser;
-import com.blog.auth.repository.user.BaseUserRepository;
+import com.blog.auth.repository.BaseUserRepository;
 import com.blog.post.dto.request.UpdateReplyRequest;
 import com.blog.post.dto.response.DeleteReplyResponse;
 import com.blog.post.dto.response.MakeReplyResponse;

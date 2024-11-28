@@ -4,12 +4,12 @@ import com.blog.auth.jwt.CustomLogoutFilter;
 import com.blog.auth.jwt.JWTFilter;
 import com.blog.auth.jwt.JWTUtil;
 import com.blog.auth.jwt.SocialUserLoginHandler;
-import com.blog.auth.repository.refresh.RefreshCustomRepository;
-import com.blog.auth.repository.refresh.RefreshRepository;
-import com.blog.auth.repository.user.BaseUserRepository;
+import com.blog.auth.repository.BaseUserRepository;
 import com.blog.auth.service.user.SocialUserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -23,23 +23,14 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final SocialUserService socialUserService;
     private final SocialUserLoginHandler socialUserLoginHandler;
-    private final RefreshRepository refreshRepository;
-    private final RefreshCustomRepository refreshCustomRepository;
     private final JWTUtil jwtUtil;
     private final BaseUserRepository baseUserRepository;
-
-    public SecurityConfig(SocialUserService socialUserService, SocialUserLoginHandler socialUserLoginHandler, RefreshRepository refreshRepository, RefreshCustomRepository refreshCustomRepository, JWTUtil jwtUtil, BaseUserRepository baseUserRepository) {
-        this.socialUserService = socialUserService;
-        this.socialUserLoginHandler = socialUserLoginHandler;
-        this.refreshRepository = refreshRepository;
-        this.refreshCustomRepository = refreshCustomRepository;
-        this.jwtUtil = jwtUtil;
-        this.baseUserRepository = baseUserRepository;
-    }
+    private final StringRedisTemplate stringRedisTemplate;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -84,7 +75,7 @@ public class SecurityConfig {
                 .successHandler(socialUserLoginHandler)); // 소셜 로그인 성공 시 socialUserLoginHandler 호출
 
         http
-                .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshRepository, refreshCustomRepository, baseUserRepository), LogoutFilter.class);
+                .addFilterBefore(new CustomLogoutFilter(jwtUtil, baseUserRepository, stringRedisTemplate), LogoutFilter.class);
 
 
 

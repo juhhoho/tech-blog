@@ -7,6 +7,7 @@ import com.blog.chat.dto.WebSocketMessageType;
 import com.blog.chat.service.RedisServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,14 +29,18 @@ public class ChatRoom {
      * @param session 웹소켓 세션
      */
     public void enter(ChatDto chatDto, WebSocketSession session) {
+        String identifier = (String) session.getAttributes().get("identifier");
+
+        // 채팅방 입장
+        redisService.enter(chatDto.getChatRoomId(), identifier);
+
         // chatDto에서 chatRoomId를 통해 입장하고자하는 채팅방 확인 후 해당 채팅방 sub
-        String channel = "chatRoom: "+chatDto.getChatRoomId();
-        redisService.subscribe(channel, session);
+        String chatRoom = "chatRoomId:"+ chatDto.getChatRoomId();
+        redisService.subscribe(chatRoom, session);
 
         // session에서 id값 get한 뒤 해당 채널(채팅방)에 입장알림 pub
-        String identifier = (String) session.getAttributes().get("identifier");
         chatDto.setMessage(identifier + "님이 입장하셨습니다.");
-        redisService.publish(channel, getTextMessage(WebSocketMessageType.ENTER, chatDto));
+        redisService.publish( chatDto.getChatRoomId(), identifier, chatRoom, getTextMessage(WebSocketMessageType.ENTER, chatDto));
     }
 
     /**
@@ -44,22 +49,28 @@ public class ChatRoom {
      * @param session 웹소켓 세션
      */
     public void exit(ChatDto chatDto, WebSocketSession session) {
-        String channel = "chatRoom: " + chatDto.getChatRoomId();
-        redisService.unsubscribe(channel, session);  // 구독 해제
-
         String identifier = (String) session.getAttributes().get("identifier");
+
+        // 채팅방 퇴장
+        redisService.exit(chatDto.getChatRoomId(), identifier);
+
+        String chatRoom = "chatRoomId:"+ chatDto.getChatRoomId();
+        redisService.unsubscribe(chatRoom, session);  // 구독 해제
+
         chatDto.setMessage(identifier + "님이 퇴장하셨습니다.");
-        redisService.publish(channel, getTextMessage(WebSocketMessageType.EXIT, chatDto));  // 퇴장 메시지 발행
+        redisService.publish(chatDto.getChatRoomId(), identifier, chatRoom, getTextMessage(WebSocketMessageType.EXIT, chatDto));  // 퇴장 메시지 발행
     }
 
     /**
      * 메시지 전송
      * @param chatDto ChatDto
      */
-    public void sendMessage(ChatDto chatDto) {
+    public void sendMessage(ChatDto chatDto, WebSocketSession session) {
+        String identifier = (String) session.getAttributes().get("identifier");
+
         // chatDto에서 chatRoomId를 통해 입장하고자하는 채팅방 확인 후 해당 채널(채팅방)에 메세지 pub
-        String channel = "chatRoom:"+chatDto.getChatRoomId();
-        redisService.publish(channel, getTextMessage(WebSocketMessageType.TALK, chatDto));
+        String chatRoom = "chatRoomId."+ chatDto.getChatRoomId();
+        redisService.publish(chatDto.getChatRoomId(), identifier, chatRoom, getTextMessage(WebSocketMessageType.TALK, chatDto));
     }
 
     /**
@@ -70,7 +81,7 @@ public class ChatRoom {
      */
     private String getTextMessage(WebSocketMessageType type, ChatDto chatDto) {
         try {
-            return objectMapper.writeValueAsString(new WebSocketMessage(type, chatDto));
+            return objectMapper.registerModule(new JavaTimeModule()).writeValueAsString(new WebSocketMessage(type, chatDto));
         }catch (JsonProcessingException e) {
             log.error(e.getMessage());
             throw new RuntimeException(e);

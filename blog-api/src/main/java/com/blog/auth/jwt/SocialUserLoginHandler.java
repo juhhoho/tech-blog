@@ -1,12 +1,12 @@
 package com.blog.auth.jwt;
 
 import com.blog.auth.dto.SocialUserDetails;
-import com.blog.auth.entity.Refresh;
-import com.blog.auth.repository.refresh.RefreshRepository;
 import com.blog.util.CookieUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -14,20 +14,15 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Iterator;
+import java.util.concurrent.TimeUnit;
 
 @Component
+@RequiredArgsConstructor
 public class SocialUserLoginHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JWTUtil jwtUtil;
-    private final RefreshRepository refreshRepository;
-
-    public SocialUserLoginHandler(JWTUtil jwtUtil, RefreshRepository refreshRepository) {
-
-        this.jwtUtil = jwtUtil;
-        this.refreshRepository = refreshRepository;
-    }
+    private final StringRedisTemplate stringRedisTemplate;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -44,20 +39,15 @@ public class SocialUserLoginHandler extends SimpleUrlAuthenticationSuccessHandle
         String role = auth.getAuthority();
 
         // 토큰 생성
-        String access = jwtUtil.createJwt("access", identifier, role, 600000L);
-        String refresh = jwtUtil.createJwt("refresh", identifier, role, 86400000L);
+        String newAccess = jwtUtil.createJwt("access", identifier, role, 600000L);
+        String newRefresh = jwtUtil.createJwt("refresh", identifier, role, 86400000L);
 
         // access: 헤더, refresh: 토큰
-        response.setHeader("access", access);
-        response.addCookie(CookieUtils.createCookie("refresh", refresh));
+        response.setHeader("access", newAccess);
+        response.addCookie(CookieUtils.createCookie("refresh", newRefresh));
 
-        // Refresh rotate
-        Refresh refreshRotate = Refresh.builder()
-                .username(identifier)
-                .refresh(refresh)
-                .expiration(new Date(System.currentTimeMillis() + 86400000L).toString())
-                .build();
+        // redis -> newRefresh 저장(24시간), 즉 24시간 동안 로그인 유지
+        stringRedisTemplate.opsForValue().set("refresh:identifier:" + identifier,  newRefresh, 24 , TimeUnit.HOURS);
 
-        refreshRepository.save(refreshRotate);
     }
 }

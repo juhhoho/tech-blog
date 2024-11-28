@@ -4,7 +4,7 @@ import com.blog.exception.CustomException.AuthInfoException;
 import com.blog.auth.dto.request.RegisterLocalUserRequest;
 import com.blog.auth.dto.response.RegisterLocalUserResponse;
 import com.blog.auth.entity.LocalUser;
-import com.blog.auth.repository.user.LocalUserRepository;
+import com.blog.auth.repository.LocalUserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+
 @RestController
 @Slf4j
 @RequiredArgsConstructor
@@ -17,7 +19,7 @@ public class RefreshController {
     private final RefreshApplicationService refreshApplicationService;
 
     @PostMapping("/reissue")
-    public ResponseEntity<ReissueResponse> reissue(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<ReissueResponse> reissue(HttpServletRequest request, HttpServletResponse response) throws IOException {
         log.info("[ReissueController - reissue]");
 
         return refreshApplicationService.reissue(request, response);

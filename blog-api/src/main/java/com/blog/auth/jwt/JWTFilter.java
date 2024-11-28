@@ -29,14 +29,14 @@ public class JWTFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        log.info("[JWTFilter - doFilterInternal]");
-
         // WebSocket 연결 요청은 필터를 건너뜀
         String requestURI = request.getRequestURI();
-        if (requestURI.startsWith("/chats")) {
+        if (requestURI.startsWith("/chats") || requestURI.startsWith("h2")) {
             filterChain.doFilter(request, response);
             return;
         }
+
+        log.info("[JWTFilter - doFilterInternal]");
 
         //request에서 access 헤더를 찾음
         String accessToken = request.getHeader("access");

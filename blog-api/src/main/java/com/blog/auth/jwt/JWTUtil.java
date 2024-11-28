@@ -49,18 +49,6 @@ public class JWTUtil {
                 .signWith(secretKey)
                 .compact();
     }
-
-//    public String getIdentifierFromHttpRequest(HttpServletRequest request) {
-//        String token = request.getHeader("Authorization");
-//
-//        if (token == null || !token.startsWith("Bearer ")) {
-//            throw new RuntimeException("Missing or invalid Authorization header");
-//        }
-//
-//        token = token.substring(7); // "Bearer " 제거
-//        return this.getUsername(token);
-//    }
-
     public String getIdentifierFromHttpRequest(HttpServletRequest request) {
         String token = request.getHeader("access");
 

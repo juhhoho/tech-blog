@@ -3,10 +3,7 @@ package com.blog.auth.service.refresh;
 import com.blog.exception.CustomException.JwtException;
 import com.blog.exception.CustomException.NoResourceFoundException;
 import com.blog.auth.dto.response.ReissueResponse;
-import com.blog.auth.entity.Refresh;
 import com.blog.auth.jwt.JWTUtil;
-import com.blog.auth.repository.refresh.RefreshCustomRepository;
-import com.blog.auth.repository.refresh.RefreshRepository;
 import com.blog.util.CookieUtils;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
@@ -14,79 +11,83 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class RefreshCommandService {
 
-    private final RefreshCustomRepository refreshCustomRepository;
-    private final RefreshRepository refreshRepository;
     private final JWTUtil jwtUtil;
+    private final StringRedisTemplate stringRedisTemplate;
 
-    public ResponseEntity<ReissueResponse> reissue(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<ReissueResponse> reissue(HttpServletRequest request, HttpServletResponse response) throws IOException {
         log.info("[RefreshCommandService - reissue]");
 
         //get refresh token
-        String refresh = null;
+        String oldRefreshToken = null;
         Cookie[] cookies = request.getCookies();
         for (Cookie cookie : cookies) {
             if (cookie.getName().equals("refresh")) {
-                refresh = cookie.getValue();
+                oldRefreshToken = cookie.getValue();
             }
         }
-        //refresh null check
-        if (refresh == null) {
-            throw new JwtException("브라우저 캐시(쿠키)에 저장된 refresh token을 찾을 수 없습니다.");
+
+        // oldRefresh 토큰의 유효성 검증을 위해 필요한 데이터 가공
+        String identifier = jwtUtil.getUsername(oldRefreshToken);
+        String role = jwtUtil.getRole(oldRefreshToken);
+        String redisKeyPattern = "refresh.identifier." + identifier;
+        String redisStoredRefreshToken = stringRedisTemplate.opsForValue().get(redisKeyPattern);
+
+
+        // oldRefresh가 유효해야만 그를 바탕으로 access, refresh 다시 만듦
+        if (!isValidRefreshToken(oldRefreshToken, redisStoredRefreshToken, response)) {
+            throw new RuntimeException("refresh token이 유효하지 않습니다.");
         }
 
-        //expired check
-        try {
-            jwtUtil.isExpired(refresh);
-        } catch (ExpiredJwtException e) {
-            throw new JwtException("브라우저 캐시(쿠키)에 저장된 refresh token의 기한이 만료되었습니다.");
-        }
+        // oldRefresh가 적절하다면 기존에 redis에 저장된 oldRefresh 삭제
+        stringRedisTemplate.delete(redisKeyPattern);
 
-        // 토큰이 refresh인지 확인 (발급시 페이로드에 명시)
-        String category = jwtUtil.getCategory(refresh);
-        if (!category.equals("refresh")) {
-            throw new JwtException("token의 타입이 refresh token이 아닙니다.");
-        }
+        // access, refresh 모두 재발급
+        String newAccessToken = jwtUtil.createJwt("access", identifier, role, 600000L);
+        String newRefreshToken = jwtUtil.createJwt("refresh", identifier, role, 86400000L);
 
-        //DB에 저장되어 있는지 확인
-        if (!refreshRepository.existsByRefresh(refresh)) {
-            //response body
-            throw new NoResourceFoundException(refresh + "를 refresh로 갖는 토큰을 찾을 수 없습니다.");
-        }
+        // redis -> newRefresh 저장(24시간), 즉 24시간 동안 로그인 유지
+        stringRedisTemplate.opsForValue().set("refresh.identifier." + identifier,  newRefreshToken, 24 , TimeUnit.HOURS);
 
-        String username = jwtUtil.getUsername(refresh);
-        String role = jwtUtil.getRole(refresh);
-
-        //make new JWT
-        String newAccess = jwtUtil.createJwt("access", username, role, 600000L);
-        String newRefresh = jwtUtil.createJwt("refresh", username, role, 86400000L);
-
-        //Refresh 토큰 저장 DB에 기존의 Refresh 토큰 삭제
-        refreshCustomRepository.deleteByRefresh(refresh);
-
-        // save refresh for rotate
-        Refresh refreshRotate = Refresh.builder()
-                .username(username)
-                .refresh(refresh)
-                .expiration(new Date(System.currentTimeMillis() + 86400000L).toString())
-                .build();
-        refreshRepository.save(refreshRotate);
-
-        //response
-        response.setHeader("access", newAccess);
-        response.addCookie(CookieUtils.createCookie("refresh", newRefresh));
+        // 새롭게 발급한 토큰 전송
+        response.setHeader("access", newAccessToken);
+        response.addCookie(CookieUtils.createCookie("refresh", newRefreshToken));
 
         return ResponseEntity
                 .ok()
-                .body(ReissueResponse.builder().newAccessToken(newAccess).build());
+                .body(ReissueResponse.builder().newAccessToken(newAccessToken).build());
+    }
+
+    private boolean isValidRefreshToken(String oldRefreshToken, String redisStoredRefreshToken, HttpServletResponse response) throws IOException {
+        // (1) token 값이 없음
+        if(oldRefreshToken == null){
+            return false;
+        }
+        // (2) 토큰 만료
+        jwtUtil.isExpired(oldRefreshToken);
+
+        // (3) refresh 토큰이 아님
+        String category = jwtUtil.getCategory(oldRefreshToken);
+        if (!"refresh".equals(category)) {
+            return false;
+        }
+
+        // (4) 같은 id에서 파생된 서버에 저장된 redisStoredRefreshToken와 oldRefreshToken 가 다른 토큰임.
+        if(!redisStoredRefreshToken.equals(redisStoredRefreshToken)){
+            return  false;
+        }
+
+        return true;
     }
 }

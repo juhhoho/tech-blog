@@ -1,9 +1,6 @@
 package com.blog.chat.config;
 
-import com.blog.auth.entity.Refresh;
 import com.blog.auth.jwt.JWTUtil;
-import com.blog.auth.repository.refresh.RefreshCustomRepository;
-import com.blog.auth.repository.refresh.RefreshRepository;
 import com.blog.util.CookieUtils;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
@@ -11,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpRequest;
@@ -21,8 +19,8 @@ import org.springframework.web.socket.server.HandshakeInterceptor;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Date;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
@@ -30,9 +28,7 @@ import java.util.Map;
 public class WebSocketAuthInterceptor implements HandshakeInterceptor {
 
     private final JWTUtil jwtUtil;
-    private final RefreshRepository refreshRepository;
-    private final RefreshCustomRepository refreshCustomRepository;
-
+    private final StringRedisTemplate stringRedisTemplate;
     /**
      * 웹소켓 연결 전 인터셉터
      * access 헤더를 확인하여 유저를 인증한다.
@@ -54,28 +50,35 @@ public class WebSocketAuthInterceptor implements HandshakeInterceptor {
             }
 
             try {
+                // access 토큰이 만료 되지 않음
                 jwtUtil.isExpired(accessToken);
             } catch (ExpiredJwtException e) {
+
+                // access 토큰이 만료됨
                 String oldRefreshToken = getRefreshTokenFromCookies(servletRequest);
-                if (oldRefreshToken == null || !isValidRefreshToken(oldRefreshToken, servletResponse)) {
+
+                // oldRefresh 토큰의 유효성 검증을 위해 필요한 데이터 가공
+                String identifier = jwtUtil.getUsername(oldRefreshToken);
+                String role = jwtUtil.getRole(oldRefreshToken);
+                String redisKeyPattern = "refresh.identifier." + identifier;
+                String redisStoredRefreshToken = stringRedisTemplate.opsForValue().get(redisKeyPattern);
+
+                // oldRefresh가 유효해야만 그를 바탕으로 access, refresh 다시 만듦
+                if (!isValidRefreshToken(oldRefreshToken, redisStoredRefreshToken, servletResponse)) {
                     return false;
                 }
 
-                // 재발급
-                String identifier = jwtUtil.getUsername(oldRefreshToken);
-                String role = jwtUtil.getRole(oldRefreshToken);
+                // oldRefresh가 적절하다면 기존에 redis에 저장된 oldRefresh 삭제
+                stringRedisTemplate.delete(redisKeyPattern);
+
+                // access, refresh 모두 재발급
                 String newAccessToken = jwtUtil.createJwt("access", identifier, role, 600000L);
                 String newRefreshToken = jwtUtil.createJwt("refresh", identifier, role, 86400000L);
 
-                refreshCustomRepository.deleteByRefresh(oldRefreshToken);
+                // redis -> newRefresh 저장(24시간), 즉 24시간 동안 로그인 유지
+                stringRedisTemplate.opsForValue().set("refresh.identifier." + identifier,  newRefreshToken, 24 , TimeUnit.HOURS);
 
-                Refresh refreshRotate = Refresh.builder()
-                        .username(identifier)
-                        .refresh(newRefreshToken)
-                        .expiration(new Date(System.currentTimeMillis() + 86400000L).toString())
-                        .build();
-                refreshRepository.save(refreshRotate);
-
+                // 새롭게 발급한 토큰 전송
                 servletResponse.setHeader("access", newAccessToken);
                 servletResponse.addCookie(CookieUtils.createCookie("refresh", newRefreshToken));
 
@@ -84,6 +87,8 @@ public class WebSocketAuthInterceptor implements HandshakeInterceptor {
             }
 
             String identifier = jwtUtil.getUsername(accessToken);
+
+            // ws 통신에서 사용할 session에 identifier 값을 넣어줌.
             attributes.put("identifier", identifier);
             return true;
         }
@@ -111,19 +116,24 @@ public class WebSocketAuthInterceptor implements HandshakeInterceptor {
     /**
      * Refresh Token의 유효성 검증
      */
-    private boolean isValidRefreshToken(String refreshToken, HttpServletResponse response) throws IOException {
+    private boolean isValidRefreshToken(String oldRefreshToken, String redisStoredRefreshToken, HttpServletResponse response) throws IOException {
         try {
-            jwtUtil.isExpired(refreshToken);
+            // (1) token 값이 없음
+            if(oldRefreshToken == null){
+                return false;
+            }
+            // (2) 토큰 만료
+            jwtUtil.isExpired(oldRefreshToken);
 
-            String category = jwtUtil.getCategory(refreshToken);
+            // (3) refresh 토큰이 아님
+            String category = jwtUtil.getCategory(oldRefreshToken);
             if (!"refresh".equals(category)) {
-                sendErrorResponse(response, "유효하지 않은 Refresh Token입니다.", 401);
                 return false;
             }
 
-            if (!refreshRepository.existsByRefresh(refreshToken)) {
-                sendErrorResponse(response, "Refresh Token이 서버에 존재하지 않습니다.", 401);
-                return false;
+            // (4) 같은 id에서 파생된 서버에 저장된 redisStoredRefreshToken와 oldRefreshToken 가 다른 토큰임.
+            if(!redisStoredRefreshToken.equals(redisStoredRefreshToken)){
+                return  false;
             }
 
             return true;

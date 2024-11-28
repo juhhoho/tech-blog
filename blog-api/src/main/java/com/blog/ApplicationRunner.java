@@ -2,8 +2,7 @@ package com.blog;
 
 import com.blog.auth.entity.BaseUser;
 import com.blog.auth.entity.LocalUser;
-import com.blog.auth.repository.user.BaseUserRepository;
-import com.blog.auth.repository.user.LocalUserRepository;
+import com.blog.auth.repository.BaseUserRepository;
 import com.blog.politicsnews.entity.DailyStat;
 import com.blog.politicsnews.repository.DailyStatRepository;
 import com.blog.post.entity.Feed;
@@ -12,6 +11,7 @@ import com.blog.post.repository.feed.FeedRepository;
 import com.blog.post.repository.recommend.RecommendRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 
@@ -25,11 +25,15 @@ public class ApplicationRunner implements CommandLineRunner {
     private final DailyStatRepository dailyStatRepository;
     private final FeedRepository feedRepository;
     private final BaseUserRepository baseUserRepository;
-    private final LocalUserRepository localUserRepository;
     private final RecommendRepository recommendRepository;
+    private final StringRedisTemplate stringRedisTemplate;
 
     @Override
     public void run(String... args) throws Exception {
+
+        // 애플리케이션 시작 시 Redis 데이터 삭제
+        stringRedisTemplate.getConnectionFactory().getConnection().flushDb();
+
 
         DailyStat stat1 = new DailyStat("PYTHON", LocalDateTime.now());
 
