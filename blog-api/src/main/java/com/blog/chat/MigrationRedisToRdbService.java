@@ -21,7 +21,7 @@ public class MigrationRedisToRdbService {
     -> fixedDelay 종료 후 정의된 시간 이후
     -> fixedDRate 시작 후 정의된 시간 이후
      */
-    @Scheduled(fixedDelay =  60 * 1000)
+    @Scheduled(fixedDelay = 60 * 60 * 1000)
     public void migrateChatLogs(){
         log.info("[MigrationRedisToRdb - migrateChatLogs]");
         redisService.migrateChatLogs();

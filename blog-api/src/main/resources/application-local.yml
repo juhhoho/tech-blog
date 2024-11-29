@@ -1,0 +1,10 @@
+spring:
+  config:
+    activate:
+      on-profile: local
+    import:
+    - classpath:/local/application-dbLocal.yml
+    - classpath:/local/application-redisLocal.yml
+    - classpath:/local/application-securityLocal.yml
+    - classpath:/local/application-jwtLocal.yml
+
