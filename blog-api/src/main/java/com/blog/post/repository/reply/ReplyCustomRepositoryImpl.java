@@ -1,5 +1,7 @@
 package com.blog.post.repository.reply;
 
+import com.blog.post.entity.QReply;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -7,25 +9,23 @@ import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Repository
-@Transactional
 public class ReplyCustomRepositoryImpl implements ReplyCustomRepository{
-
-    private final EntityManager entityManager;
+    private final JPAQueryFactory jpaQueryFactory;
 
     @Override
+    @Transactional
     public void updateReply(Long replyId, String newContent) {
-        String jpql = "UPDATE Reply r SET r.content = :newContent WHERE r.id = :replyId";
-        entityManager.createQuery(jpql)
-                .setParameter("replyId", replyId)
-                .setParameter("newContent", newContent)
-                .executeUpdate();
+        jpaQueryFactory.update(QReply.reply)
+                .set(QReply.reply.content, newContent)
+                .where(QReply.reply.id.eq(replyId))
+                .execute();
     }
 
     @Override
+    @Transactional
     public void deleteReply(Long replyId) {
-        String jpql = "DELETE FROM Reply r WHERE r.id = :replyId";
-        entityManager.createQuery(jpql)
-                .setParameter("replyId", replyId)
-                .executeUpdate();
+        jpaQueryFactory.delete(QReply.reply)
+                .where(QReply.reply.id.eq(replyId))
+                .execute();
     }
 }

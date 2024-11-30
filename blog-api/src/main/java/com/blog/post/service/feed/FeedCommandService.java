@@ -8,7 +8,6 @@ import com.blog.post.dto.response.DeleteBlogFeedResponse;
 import com.blog.post.dto.response.MakeBlogFeedResponse;
 import com.blog.post.dto.response.UpdateBlogFeedResponse;
 import com.blog.post.entity.Feed;
-import com.blog.post.repository.feed.FeedCustomRepository;
 import com.blog.post.repository.feed.FeedRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,7 +28,6 @@ import java.time.LocalDateTime;
 public class FeedCommandService {
     private final FeedRepository feedRepository;
     private final BaseUserRepository baseUserRepository;
-    private final FeedCustomRepository feedCustomRepository;
 
     public ResponseEntity<MakeBlogFeedResponse> makeBlogFeed(String title, String description, String identifier) {
         log.info("[FeedCommandService - makeBlogFeed] title = {}, description = {}, identifier ={}", title, description, identifier);
@@ -80,7 +78,7 @@ public class FeedCommandService {
                 Feed feed = feedRepository.findById(feedId).orElseThrow(
                         ()-> new NoResourceFoundException(feedId + "를 id로 갖는 feed를 찾을 수 없습니다."));
 
-                feedCustomRepository.addViewCount(feed);
+                feedRepository.addViewCount(feed);
 
                 oldCookie.setValue(oldCookie.getValue() + "_[" + feedId + "]");
                 oldCookie.setPath("/");
@@ -94,7 +92,7 @@ public class FeedCommandService {
             Feed feed = feedRepository.findById(feedId).orElseThrow(
                     ()-> new NoResourceFoundException(feedId + "를 id로 갖는 feed를 찾을 수 없습니다."));
 
-            feedCustomRepository.addViewCount(feed);
+            feedRepository.addViewCount(feed);
 
             Cookie newCookie = new Cookie("feedView","[" + feedId + "]");
             newCookie.setPath("/");
@@ -117,7 +115,7 @@ public class FeedCommandService {
             throw new ForbiddenAccessException("해당 feed에 대한 수정 권한이 없는 사용자입니다.");
         }
 
-        feedCustomRepository.updateFeedTitleDescriptionLastBuildTime(oldFeed, title, description, LocalDateTime.now());
+        feedRepository.updateFeed(oldFeed, title, description, LocalDateTime.now());
 
         UpdateBlogFeedResponse updateBlogFeedResponse = UpdateBlogFeedResponse.builder()
                 .id(oldFeed.getId())

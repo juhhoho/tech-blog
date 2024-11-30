@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -47,11 +48,10 @@ public class FeedController {
     public PageResult<GetBlogFeedsResponse> getSomeBlogFeeds(
             @RequestParam(defaultValue = "1") @Min(1) @Max(10000) int page,
             @RequestParam(defaultValue = "5") @Min(1) @Max(50) int size,
-            @RequestParam(defaultValue = "") String title,
-            @RequestParam(defaultValue = "") String description)
+            @RequestParam @Size(min = 2, message = "검색 키워드는 최소 2글자 이상이어야 합니다.") String keyword)
     {
-        log.info("[FeedController - getSomeBlogFeeds] page = {}, size = {}, title = {}, description = {}", page, size, title, description);
-        return feedApplicationService.getSomeBlogFeeds(page, size, title, description);
+        log.info("[FeedController - getSomeBlogFeeds] page = {}, size = {}, keyword = {}", page, size, keyword);
+        return feedApplicationService.getSomeBlogFeeds(page, size, keyword);
     }
 
 

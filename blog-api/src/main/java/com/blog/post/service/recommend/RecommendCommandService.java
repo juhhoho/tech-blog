@@ -10,12 +10,10 @@ import com.blog.post.dto.response.UnDislikeFeedResponse;
 import com.blog.post.dto.response.UnlikeFeedResponse;
 import com.blog.post.entity.Feed;
 import com.blog.post.entity.Recommend;
-import com.blog.post.repository.feed.FeedCustomRepository;
 import com.blog.post.repository.feed.FeedRepository;
 import com.blog.post.repository.recommend.RecommendRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -32,9 +30,6 @@ public class RecommendCommandService {
     private final BaseUserRepository baseUserRepository;
     private final FeedRepository feedRepository;
 
-    @Qualifier("feedCustomRepositoryImpl")
-    private final FeedCustomRepository feedCustomRepository;
-
     public ResponseEntity<LikeFeedResponse> likeFeed(Long feedId, String identifier){
         log.info("[RecommendCommandService - likeFeed] feedId = {}, identifier = {}", feedId, identifier);
         Feed feed = feedRepository.findById(feedId).orElseThrow(
@@ -46,7 +41,7 @@ public class RecommendCommandService {
         );
 
         // 이미 like -> error 처리
-        if(recommendRepository.findByUserAndFeedAndType(user, feed, "like").isPresent()){
+        if(recommendRepository.checkDuplicate(user, feed, "like").isPresent()){
             throw new RecommendException("동일한 feed에 중복해서 추천을 누를 수 없습니다.");
         }
         Recommend recommend = Recommend.builder()
@@ -58,7 +53,7 @@ public class RecommendCommandService {
         recommendRepository.saveAndFlush(recommend);
 
         // feed에 대해 count + 1, 중복 x
-        feedCustomRepository.addLikeCount(feed);
+        feedRepository.addLikeCount(feed);
         LikeFeedResponse likeFeedResponse = LikeFeedResponse.builder()
                 .userId(user.getId())
                 .feedId(feed.getId())
@@ -82,7 +77,7 @@ public class RecommendCommandService {
         );
 
         // 이미 dislike -> error 처리
-        if(recommendRepository.findByUserAndFeedAndType(user, feed, "dislike").isPresent()){
+        if(recommendRepository.checkDuplicate(user, feed, "dislike").isPresent()){
             throw new RecommendException("동일한 feed에 중복해서 비추천을 누를 수 없습니다.");
         }
         Recommend recommend = Recommend.builder()
@@ -94,7 +89,7 @@ public class RecommendCommandService {
         recommendRepository.saveAndFlush(recommend);
 
         // feed에 대해 count + 1, 중복 x
-        feedCustomRepository.addDislikeCount(feed);
+        feedRepository.addDislikeCount(feed);
 
 
         DislikeFeedResponse dislikeFeedResponse = DislikeFeedResponse.builder()
@@ -119,14 +114,14 @@ public class RecommendCommandService {
                 () -> new NoResourceFoundException(identifier + "을 identifier 값으로 갖는 user를 찾을 수 없습니다.")
         );
 
-        Recommend recommend = recommendRepository.findByUserAndFeedAndType(user, feed, "like").orElseThrow(
+        Recommend recommend = recommendRepository.checkDuplicate(user, feed, "like").orElseThrow(
                 ()-> new NoResourceFoundException(identifier + "을 identifier으로 갖는 user는 " + feedId + "를 id값으로 갖는 feed에 추천을 누르지 않았습니다.")
         );
 
         recommendRepository.delete(recommend);
 
         // feed에 대해 count - 1, 중복 x
-        feedCustomRepository.subLikeCount(feed);
+        feedRepository.subLikeCount(feed);
 
         UnlikeFeedResponse unlikeFeedResponse = UnlikeFeedResponse.builder()
                 .userId(user.getId())
@@ -150,14 +145,15 @@ public class RecommendCommandService {
                 () -> new NoResourceFoundException(identifier + "을 identifier 값으로 갖는 user를 찾을 수 없습니다.")
         );
 
-        Recommend recommend = recommendRepository.findByUserAndFeedAndType(user, feed, "dislike").orElseThrow(
+        Recommend recommend = recommendRepository.checkDuplicate(user, feed, "dislike").orElseThrow(
                 ()-> new NoResourceFoundException(identifier + "을 identifier으로 갖는 user는 " + feedId + "를 id값으로 갖는 feed에 비추천을 누르지 않았습니다.")
         );
+
 
         recommendRepository.delete(recommend);
 
         // feed에 대해 count - 1, 중복 x
-        feedCustomRepository.subDislikeCount(feed);
+        feedRepository.subDislikeCount(feed);
 
         UnDislikeFeedResponse unDislikeFeedResponse = UnDislikeFeedResponse.builder()
                 .userId(user.getId())

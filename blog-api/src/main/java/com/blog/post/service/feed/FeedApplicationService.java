@@ -33,8 +33,8 @@ public class FeedApplicationService {
         return feedQueryService.getOneBlogFeed(feedId);
     }
 
-    public PageResult<GetBlogFeedsResponse> getSomeBlogFeeds(int page, int size, String title, String description) {
-        return feedQueryService.getSomeBlogFeeds(page, size, title, description);
+    public PageResult<GetBlogFeedsResponse> getSomeBlogFeeds(int page, int size, String keyword) {
+        return feedQueryService.getSomeBlogFeeds(page, size, keyword);
     }
 
     public ResponseEntity<UpdateBlogFeedResponse> updateBlogFeed(Long feedId, String title, String description, String username){
