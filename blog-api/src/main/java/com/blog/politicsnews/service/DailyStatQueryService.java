@@ -1,7 +1,7 @@
 package com.blog.politicsnews.service;
 
 import com.blog.politicsnews.dto.response.StatResponse;
-import com.blog.politicsnews.repository.DailyStatRepository;
+import com.blog.politicsnews.repository.dailystat.DailyStatRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,7 +20,7 @@ public class DailyStatQueryService {
     public static final int SIZE = 5;
 
     public StatResponse findQueryCount(String query, LocalDate date){
-        long count = dailyStatRepository.countByQueryAndEventDateTimeBetween(
+        long count = dailyStatRepository.getQueryCountByDate(
                 query,
                 date.atStartOfDay(),
                 date.atTime(LocalTime.MAX)

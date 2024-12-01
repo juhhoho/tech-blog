@@ -2,9 +2,9 @@ package com.blog;
 
 import com.blog.auth.entity.BaseUser;
 import com.blog.auth.entity.LocalUser;
-import com.blog.auth.repository.BaseUserRepository;
+import com.blog.auth.repository.BaseUser.BaseUserRepository;
 import com.blog.politicsnews.entity.DailyStat;
-import com.blog.politicsnews.repository.DailyStatRepository;
+import com.blog.politicsnews.repository.dailystat.DailyStatRepository;
 import com.blog.post.entity.Feed;
 import com.blog.post.entity.Recommend;
 import com.blog.post.repository.feed.FeedRepository;

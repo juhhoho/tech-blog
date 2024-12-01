@@ -4,7 +4,7 @@ import com.blog.auth.jwt.CustomLogoutFilter;
 import com.blog.auth.jwt.JWTFilter;
 import com.blog.auth.jwt.JWTUtil;
 import com.blog.auth.jwt.SocialUserLoginHandler;
-import com.blog.auth.repository.BaseUserRepository;
+import com.blog.auth.repository.BaseUser.BaseUserRepository;
 import com.blog.auth.service.user.SocialUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

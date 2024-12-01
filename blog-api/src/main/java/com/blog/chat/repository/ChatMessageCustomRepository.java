@@ -1,4 +1,4 @@
 package com.blog.chat.repository;
 
-public class ChatMessageCustomRepository {
+public interface ChatMessageCustomRepository {
 }

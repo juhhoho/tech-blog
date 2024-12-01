@@ -1,7 +1,7 @@
 package com.blog.politicsnews.service
 
 import com.blog.politicsnews.entity.DailyStat
-import com.blog.politicsnews.repository.DailyStatRepository
+import com.blog.politicsnews.repository.dailystat.DailyStatRepository
 import spock.lang.Specification
 
 import java.time.LocalDateTime

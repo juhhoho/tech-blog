@@ -1,12 +1,6 @@
 package com.blog.auth.jwt;
 
-import com.blog.auth.dto.response.ReissueResponse;
-import com.blog.auth.entity.BaseUser;
-import com.blog.auth.repository.BaseUserRepository;
-import com.blog.exception.CustomException.JwtException;
-import com.blog.exception.CustomException.NoResourceFoundException;
-import com.blog.util.CookieUtils;
-import io.jsonwebtoken.ExpiredJwtException;
+import com.blog.auth.repository.BaseUser.BaseUserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
@@ -17,11 +11,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @RequiredArgsConstructor

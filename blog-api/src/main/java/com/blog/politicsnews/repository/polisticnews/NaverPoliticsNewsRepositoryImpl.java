@@ -1,4 +1,4 @@
-package com.blog.politicsnews.repository;
+package com.blog.politicsnews.repository.polisticnews;
 
 import com.blog.Item;
 import com.blog.NaverNewsResponse;
@@ -13,7 +13,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Repository
-public class NaverPoliticsNewsRepository implements PoliticsNewsRepository {
+public class NaverPoliticsNewsRepositoryImpl implements PoliticsNewsRepository {
 
     private final NaverClient naverClient;
 

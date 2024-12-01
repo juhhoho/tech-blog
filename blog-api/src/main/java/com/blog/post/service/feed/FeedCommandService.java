@@ -3,7 +3,7 @@ package com.blog.post.service.feed;
 import com.blog.exception.CustomException.ForbiddenAccessException;
 import com.blog.exception.CustomException.NoResourceFoundException;
 import com.blog.auth.entity.BaseUser;
-import com.blog.auth.repository.BaseUserRepository;
+import com.blog.auth.repository.BaseUser.BaseUserRepository;
 import com.blog.post.dto.response.DeleteBlogFeedResponse;
 import com.blog.post.dto.response.MakeBlogFeedResponse;
 import com.blog.post.dto.response.UpdateBlogFeedResponse;

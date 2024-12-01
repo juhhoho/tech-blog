@@ -6,7 +6,7 @@ import com.blog.auth.dto.request.LoginLocalUserRequest;
 import com.blog.auth.dto.response.LoginLocalUserResponse;
 import com.blog.auth.entity.LocalUser;
 import com.blog.auth.jwt.JWTUtil;
-import com.blog.auth.repository.LocalUserRepository;
+import com.blog.auth.repository.LocalUser.LocalUserRepository;
 import com.blog.util.CookieUtils;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +31,7 @@ public class LocalUserQueryService {
     public ResponseEntity<LoginLocalUserResponse> loginLocalUser(LoginLocalUserRequest loginLocalUserRequest, HttpServletResponse response) {
         log.info("[LocalUserQueryService - loginLocalUser] loginLocalUserRequest = {}", loginLocalUserRequest);
 
-        LocalUser localUser = localUserRepository.findLocalUserByIdentifier(loginLocalUserRequest.getIdentifier()).orElseThrow(
+        LocalUser localUser = localUserRepository.findByIdentifier(loginLocalUserRequest.getIdentifier()).orElseThrow(
                 ()-> new NoResourceFoundException(loginLocalUserRequest.getIdentifier() + "를 identifier로 갖는 localUser를 찾을 수 없습니다."));
 
 

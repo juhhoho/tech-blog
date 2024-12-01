@@ -5,7 +5,7 @@ import com.blog.auth.dto.UserDTO;
 import com.blog.auth.dto.response.NaverResponse;
 import com.blog.auth.dto.response.OAuth2Response;
 import com.blog.auth.entity.SocialUser;
-import com.blog.auth.repository.SocialUserRepository;
+import com.blog.auth.repository.SocialUser.SocialUserRepository;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -47,7 +47,7 @@ public class SocialUserService extends DefaultOAuth2UserService {
         * */
 
         String identifier = oAuth2Response.getProvider()+" "+oAuth2Response.getProviderId();
-        Optional<SocialUser> existUser = socialUserRepository.findSocialUserByIdentifier(identifier);
+        Optional<SocialUser> existUser = socialUserRepository.findByIdentifier(identifier);
 
         // 새로운 사용자
         if (existUser.isEmpty()) {

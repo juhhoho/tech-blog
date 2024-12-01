@@ -1,6 +1,6 @@
 package com.blog.politicsnews.service
 
-import com.blog.politicsnews.repository.DailyStatRepository
+import com.blog.politicsnews.repository.dailystat.DailyStatRepository
 import org.springframework.data.domain.Pageable
 import spock.lang.Specification
 

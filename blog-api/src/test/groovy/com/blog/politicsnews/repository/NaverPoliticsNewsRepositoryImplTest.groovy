@@ -3,16 +3,18 @@ package com.blog.politicsnews.repository
 import com.blog.Item
 import com.blog.NaverNewsResponse
 import com.blog.feign.NaverClient
+import com.blog.politicsnews.repository.polisticnews.NaverPoliticsNewsRepositoryImpl
+import com.blog.politicsnews.repository.polisticnews.PoliticsNewsRepository
 import spock.lang.Specification
 
 import java.time.LocalDate
 
-class NaverPoliticsNewsRepositoryTest extends Specification {
+class NaverPoliticsNewsRepositoryImplTest extends Specification {
     NaverClient naverClient = Mock()
     PoliticsNewsRepository politicsBlogRepository
 
     void setup(){
-        politicsBlogRepository = new NaverPoliticsNewsRepository(naverClient)
+        politicsBlogRepository = new NaverPoliticsNewsRepositoryImpl(naverClient)
     }
 
     def "search 호출 시 적절한 데이터 반환"(){

@@ -1,4 +1,4 @@
-package com.blog.politicsnews.repository;
+package com.blog.politicsnews.repository.polisticnews;
 
 import com.blog.pagination.PageResult;
 import com.blog.politicsnews.dto.response.SearchResponse;

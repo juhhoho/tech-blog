@@ -1,7 +1,7 @@
 package com.blog.chat.service;
 
 import com.blog.auth.entity.BaseUser;
-import com.blog.auth.repository.BaseUserRepository;
+import com.blog.auth.repository.BaseUser.BaseUserRepository;
 import com.blog.chat.entity.ChatMessageEntity;
 import com.blog.chat.repository.ChatMessageRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;

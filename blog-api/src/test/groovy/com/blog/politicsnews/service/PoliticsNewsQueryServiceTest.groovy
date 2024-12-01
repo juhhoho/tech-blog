@@ -1,6 +1,6 @@
 package com.blog.politicsnews.service
 
-import com.blog.politicsnews.repository.PoliticsNewsRepository
+import com.blog.politicsnews.repository.polisticnews.PoliticsNewsRepository
 import spock.lang.Specification
 
 class PoliticsNewsQueryServiceTest extends Specification {

@@ -2,6 +2,7 @@ package com.blog.politicsnews.repository
 
 import com.blog.feign.NaverClient
 import com.blog.politicsnews.entity.DailyStat
+import com.blog.politicsnews.repository.dailystat.DailyStatRepository
 import jakarta.persistence.EntityManager
 import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
